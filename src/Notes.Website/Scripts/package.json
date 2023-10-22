@@ -1,0 +1,24 @@
+{
+  "name": "notes-scripts",
+  "version": "1.0.0",
+  "description": "Front End for the Notes Application",
+  "private": true,
+  "scripts": {
+    "build": "webpack --config webpack.config.prod.js | strip-ansi",
+    "build-dev": "webpack --config webpack.config.dev.js | strip-ansi"
+  },
+  "author": "Steffen Blake",
+  "license": "MIT",
+  "devDependencies": {
+    "csp-html-webpack-plugin": "^5.1.0",
+    "css-loader": "^6.8.1",
+    "css-minimizer-webpack-plugin": "^5.0.1",
+    "filemanager-webpack-plugin": "^8.0.0",
+    "html-webpack-plugin": "^5.5.3",
+    "mini-css-extract-plugin": "^2.7.6",
+    "strip-ansi-cli": "^3.0.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-merge": "^5.10.0"
+  }
+}
