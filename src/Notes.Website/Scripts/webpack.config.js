@@ -1,14 +1,9 @@
 const path = require('path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-
-const FileManagerPlugin = require('filemanager-webpack-plugin');
-
-const dist = path.resolve(__dirname, 'dist');
 
 module.exports = {
     entry: './src/index.js',
@@ -20,7 +15,9 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/i,
+                include: path.resolve(__dirname, 'src/notes.css'),
                 use: [MiniCssExtractPlugin.loader, "css-loader"],
+                sideEffects: true,
             },
         ],
     },
@@ -29,22 +26,9 @@ module.exports = {
             title: 'Notes',
             template: './src/index.ejs'
         }),
-        new CspHtmlWebpackPlugin({
-            'script-src': '',
-            'style-src': ''
-        }),
-        new MiniCssExtractPlugin(),
-        new FileManagerPlugin({
-            events: {
-                onEnd: {
-                    copy: [
-                        {
-                            source: path.resolve(__dirname, 'dist/*'),
-                            destination: path.resolve(__dirname, '../wwwroot')
-                        }
-                    ]
-                }
-            }
+        new MiniCssExtractPlugin({
+            filename: "[name].css",
+            chunkFilename: "[id].css"
         })
     ],
     optimization: {

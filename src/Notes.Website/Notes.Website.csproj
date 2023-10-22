@@ -36,6 +36,7 @@
     <Scripts Include="Scripts\src\**\*" />
     <Scripts Include="Scripts\*.js" />
     <Scripts Include="Scripts\*.json" />
+    <ScriptsOut Include="Scripts\dist\*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug'">
@@ -44,6 +45,10 @@
 
   <ItemGroup Condition="'$(Configuration)'=='Release'">
     <ScriptsOut Include="Scripts\node_modules\.build-prod-stamp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <Target Name="NpmInstall" Inputs="Scripts/package-lock.json" Outputs="Scripts/node_modules/.install-stamp" AfterTargets="PostBuildEvent">
@@ -57,11 +62,19 @@
     <Message Importance="high" Text="========= NPM Build-Dev ========= " />
     <Exec Command="npm run build-dev" WorkingDirectory="Scripts" />
     <Touch Files="Scripts/node_modules/.build-dev-stamp" AlwaysCreate="true" />
+    <Message Importance="high" Text="========= HASHING ========= " />
+    <GetFileHash Files="Scripts/dist/notes.js" HashEncoding="base64">
+      <Output TaskParameter="Items" ItemName="JsHashes" />
+    </GetFileHash>
+    <Message Importance="high" Text="@(JsHashes->'%(FileHash)')" />
+    <Copy SourceFiles="Scripts/dist/index.html;Scripts/dist/main.css;Scripts/dist/notes.js" DestinationFolder="wwwroot" />
   </Target>
 
   <Target Name="NpmBuild" AfterTargets="NpmInstall" Condition="'$(Configuration)'=='Release'" Inputs="@(Scripts)" Outputs="@(ScriptsOut)">
     <Message Importance="high" Text="========= NPM Build ========= " />
     <Exec Command="npm run build" WorkingDirectory="Scripts" />
     <Touch Files="Scripts/node_modules/.build-prod-stamp" AlwaysCreate="true" />
+    <Copy SourceFiles="Scripts/dist/index.html;Scripts/dist/main.css;Scripts/dist/notes.js" DestinationFolder="wwwroot" />
   </Target>
+
 </Project>

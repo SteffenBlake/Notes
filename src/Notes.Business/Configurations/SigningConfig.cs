@@ -5,6 +5,9 @@ namespace Notes.Business.Configurations;
 public class SigningConfig
 {
     public string JWTSecret { get; set; } = default!;
+    public List<string> JsHashes { get; set; } = new();
+    public List<string> CssHashes { get; set; } = new();
+
     public void Validate()
     {
         if (string.IsNullOrEmpty(JWTSecret))
