@@ -4,7 +4,6 @@
   "description": "Front End for the Notes Application",
   "private": true,
   "scripts": {
-    "csp": "node csp.js",
     "build": "webpack --config webpack.config.prod.js | strip-ansi",
     "build-dev": "webpack --config webpack.config.dev.js | strip-ansi"
   },
@@ -13,7 +12,6 @@
   "devDependencies": {
     "css-loader": "^6.8.1",
     "css-minimizer-webpack-plugin": "^5.0.1",
-    "folder-hash": "^4.0.4",
     "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.7.6",
     "strip-ansi-cli": "^3.0.2",

@@ -1,11 +1,10 @@
 using System.Configuration;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Notes.Business;
@@ -14,6 +13,7 @@ using Notes.Business.Extensions;
 using Notes.Business.Services.Abstractions;
 using Notes.Data;
 using Notes.Data.Models.Identity;
+using Notes.Website.Middleware;
 
 namespace Notes.Website
 {
@@ -59,39 +59,14 @@ namespace Notes.Website
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
-            var cspBuilder = new StringBuilder();
-            cspBuilder.Append("default-src 'none';");
-            cspBuilder.Append("img-src 'self';");
-            cspBuilder.Append("font-src 'self';");
-            cspBuilder.Append($"script-src-elem {string.Join(' ',config.Signing.JsHashes)};");
-            cspBuilder.Append($"style-src-elem {string.Join(' ',config.Signing.CssHashes)};");
-            var cspHeader = cspBuilder.ToString();
-
-            app.Use(async (context, next) =>
-            {
-                context.Response.OnStarting(() =>
-                {
-                    var requestPath = context.Request.Path.Value;
-
-                    if (requestPath == "/index.html")
-                    {
-                        context.Response.Headers.Add("Content-Security-Policy", cspHeader);
-                    }
-
-                    return Task.FromResult(0);
-                });
-
-                await next();
-            });
-
-            app.UseStaticFiles();
-
             app.MapControllers();
-            app.MapFallbackToFile("index.html");
+
+            app.Use(IndexPageMiddleware.Compile(builder.Environment.WebRootFileProvider));
 
             await app.RunAsync();
         }
@@ -104,33 +79,8 @@ namespace Notes.Website
                          );
             config.Validate();
 
-            var dir = builder.Environment.WebRootFileProvider.GetDirectoryContents("");
-            foreach (var file in dir)
-            {
-                if (file.Name.EndsWith(".js"))
-                {
-                    config.Signing.JsHashes.Add(ComputeFileHash(file));
-                }
-                else if (file.Name.EndsWith(".css"))
-                {
-                    config.Signing.CssHashes.Add(ComputeFileHash(file));
-                }
-            }
-
             builder.Services.AddSingleton(config);
             return config;
-        }
-
-        private static string ComputeFileHash(IFileInfo file)
-        {
-            using var stream = file.CreateReadStream();
-            using var reader = new StreamReader(stream);
-            using var sha384 = SHA384.Create();
-
-            var text = reader.ReadToEnd();
-            var utf = Encoding.UTF8.GetBytes(text);
-            var hash = sha384.ComputeHash(utf);
-            return "'sha384-" + Convert.ToBase64String(hash) + "'";
         }
 
         private static void EnsureSwagger(WebApplicationBuilder builder)
