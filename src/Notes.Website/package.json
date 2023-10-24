@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build": "cd Scripts && npm run build",
+    "build-dev": "cd Scripts && npm run build-dev",
+    "watch": "cd Scripts && npm run watch",
+    "install": "cd Scripts && npm install",
+    "update": "cd Scripts && npm update",
+    "ci": "cd Scripts && npm ci"
+  }
+}

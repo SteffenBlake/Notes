@@ -9,7 +9,7 @@ namespace Notes.Business.Extensions
         public static void AddBusinessServices(this IServiceCollection services)
         {
             services.AddTransient<IDatabaseInitService, DatabaseInitService>();
-
+            services.AddTransient<IContentService, ContentService>();
         }
     }
 }

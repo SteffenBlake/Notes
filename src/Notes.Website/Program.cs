@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -67,6 +68,17 @@ namespace Notes.Website
             app.MapControllers();
 
             app.Use(IndexPageMiddleware.Compile(builder.Environment.WebRootFileProvider));
+
+            var pathGroup = app.MapGroup("/api/{**path}")
+                .RequireAuthorization()
+                .ExcludeFromDescription();
+
+            pathGroup.MapGet("", 
+                async (string path, IContentService svc) => await svc.GetAsync(path)
+            );
+            pathGroup.MapPut("",
+                async (string path, [FromBody]string data, IContentService svc) => await svc.PutAsync(path, data)
+            );
 
             await app.RunAsync();
         }

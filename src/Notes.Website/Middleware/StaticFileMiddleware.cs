@@ -1,8 +1,5 @@
-﻿using System.Globalization;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Primitives;
-
 namespace Notes.Website.Middleware
 {
     public static class IndexPageMiddleware

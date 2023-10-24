@@ -39,6 +39,14 @@
     <OutScripts Include="Scripts\dist\*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Scripts Remove="Scripts\src\notes.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Scripts\src\notes.scss" />
+  </ItemGroup>
+
   <Target Name="NpmInstall" Inputs="Scripts/package-lock.json" Outputs="Scripts/node_modules/.install-stamp" AfterTargets="PostBuildEvent">
     <Message Importance="high" Text="========= NPM Install ========= " />
     <MakeDir Directories="Scripts/node_modules" />
@@ -49,14 +57,12 @@
   <Target Name="NpmBuildDev" AfterTargets="NpmInstall" Condition="'$(Configuration)'=='Debug'" Inputs="@(Scripts)" Outputs="Scripts\node_modules\.build-dev-stamp">
     <Message Importance="high" Text="========= NPM Build-Dev ========= " />
     <Exec Command="npm run build-dev" WorkingDirectory="Scripts" />
-    <Copy SourceFiles="@(OutScripts)" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
     <Touch Files="Scripts/node_modules/.build-dev-stamp" AlwaysCreate="true" />
   </Target>
 
   <Target Name="NpmBuild" AfterTargets="NpmInstall" Condition="'$(Configuration)'=='Release'" Inputs="@(Scripts)" Outputs="Scripts\node_modules\.build-prod-stamp">
     <Message Importance="high" Text="========= NPM Build ========= " />
     <Exec Command="npm run build" WorkingDirectory="Scripts" />
-    <Copy SourceFiles="@(OutScripts)" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
     <Touch Files="Scripts/node_modules/.build-prod-stamp" AlwaysCreate="true" />
   </Target>
 

@@ -1,0 +1,99 @@
+﻿html {
+    min-height: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+body, main, .ck-editor, .ck-editor__main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ck-editor__main {
+    padding: 8px;
+}
+
+.ck-editor__editable {
+    flex-grow: 1;
+}
+
+.ck-editor__top {
+    height: 0;
+    max-height: 0;
+    display: none;
+}
+
+body {
+    color: white;
+    background-color: black;
+    margin: 0;
+}
+
+:root {
+    --ck-custom-background: black;
+    --ck-custom-foreground: white;
+    --ck-color-base-background: black;
+}
+
+header{
+    height: 0;
+}
+
+header > nav {
+    height: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+header.show > nav {
+    height: 50px;
+}
+
+.navigation {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-grow: 1;
+}
+.navigation > li {
+    list-style-type: none;
+}
+header a {
+    text-decoration: none;
+    color: transparent;
+    cursor: default;
+}
+
+header.show a {
+    color: white;
+    cursor: pointer;
+}
+
+.menu-btn {
+    position: absolute;
+    top:0;
+    right: 0;
+    z-index: 99;
+    cursor: pointer;
+}
+
+
+svg {
+    height: 50px;
+    width: 50px;
+    path {
+        fill: darkgray;
+    }
+}
+
+
+svg.menu {
+    path
+    {
+        d: path("M 5 8 A 2.0002 2.0002 0 1 0 5 12 L 45 12 A 2.0002 2.0002 0 1 0 45 8 L 5 8 z M 5 23 A 2.0002 2.0002 0 1 0 5 27 L 45 27 A 2.0002 2.0002 0 1 0 45 23 L 5 23 z M 5 38 A 2.0002 2.0002 0 1 0 5 42 L 45 42 A 2.0002 2.0002 0 1 0 45 38 L 5 38 z");
+    }
+}
