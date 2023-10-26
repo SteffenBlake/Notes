@@ -40,10 +40,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Scripts Remove="scripts\src\ck-editor\custom-style.scss" />
     <Scripts Remove="Scripts\src\notes.scss" />
   </ItemGroup>
 
   <ItemGroup>
+    <UpToDateCheckInput Remove="scripts\src\ck-editor\custom-style.scss" />
     <UpToDateCheckInput Remove="Scripts\src\notes.scss" />
   </ItemGroup>
 

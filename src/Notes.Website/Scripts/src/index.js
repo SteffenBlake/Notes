@@ -1,26 +1,11 @@
-import { NotesEditor } from "./notes-editor.js";
+import { NotesEditor } from "./ck-editor/notes-editor.js";
 
 import "./notes.scss";
 
-NotesEditor
-    .create(document.querySelector('#app'))
-    .then(editor => {
-        console.log('Editor was initialized', editor);
-    })
-    .catch(error => {
-        console.error(error.stack);
-    });
+async function init() {
+    var editor = await NotesEditor.create(document.querySelector('#app'));
 
-document.querySelectorAll('header>nav a').forEach(elem => {
-    elem.addEventListener('focus', showMenu);
-    elem.addEventListener('blur', hideMenu);
-});
-
-function showMenu()
-{
-    document.querySelector('header').classList.add('show');
-}
-function hideMenu() {
-    document.querySelector('header').classList.remove('show');
+    document.getElementById("skip-btn").addEventListener("click", () => editor.editing.view.focus());
 }
 
+(async () => init())();

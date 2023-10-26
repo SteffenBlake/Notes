@@ -26,3 +26,5 @@ NotesEditor.defaultConfig = {
     toolbar: [],
     language: 'en'
 };
+
+import './custom-style.scss';

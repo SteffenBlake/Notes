@@ -1,55 +1,48 @@
-﻿html {
+﻿$background-black: #0F0F0F;
+$background-blue: #232D3F;
+$notable-green: #005B41;
+$highlight-torquise: #008170;
+
+html {
     min-height: 100%;
 
     display: flex;
     flex-direction: column;
 }
 
-body, main, .ck-editor, .ck-editor__main {
+body, main {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
-.ck-editor__main {
-    padding: 8px;
-}
-
-.ck-editor__editable {
-    flex-grow: 1;
-}
-
-.ck-editor__top {
-    height: 0;
-    max-height: 0;
-    display: none;
-}
-
 body {
     color: white;
-    background-color: black;
+    background-color: $background-black;
     margin: 0;
 }
 
-:root {
-    --ck-custom-background: black;
-    --ck-custom-foreground: white;
-    --ck-color-base-background: black;
-}
-
-header{
+header {
     height: 0;
 }
 
+$header-size: 40px;
 header > nav {
-    height: 0;
+    margin-top: -$header-size;
+    height: $header-size;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
+    background-color: $background-blue;
+    z-index: 999;
+    position: relative;
+    transition-property: margin-top;
+    transition-duration: 0.5s;
 }
-header.show > nav {
-    height: 50px;
+
+header > nav:focus-within {
+    margin-top: 0px;
 }
 
 .navigation {
@@ -59,41 +52,60 @@ header.show > nav {
     align-items: center;
     flex-grow: 1;
 }
+
 .navigation > li {
     list-style-type: none;
 }
+
 header a {
     text-decoration: none;
-    color: transparent;
-    cursor: default;
+    color: $highlight-torquise;
+    cursor: pointer;
+    font-size: xx-large;
+    font-weight: 500;
+    font-family: Tahoma;
+    display: inline-block;
+    filter: drop-shadow(1px 1px 1px $notable-green);
+    transform: translate(0px, 0px);
+    transition: all 0.2s ease-in-out;
 }
 
-header.show a {
-    color: white;
-    cursor: pointer;
-}
+header a:hover {
+    filter: drop-shadow(4px 2px 2px $notable-green);
+    transform: translate(-1px, -2px);
+}    
 
 .menu-btn {
     position: absolute;
-    top:0;
+    top: 0;
     right: 0;
-    z-index: 99;
     cursor: pointer;
+    z-index: 97;
+    height: $header-size;
+    width: $header-size;
 }
 
+header > nav:focus-within + .menu-btn {
+    z-index: -1;
+}
 
-svg {
-    height: 50px;
-    width: 50px;
+svg.notes {
+    width: 100%;
+    height: 100%;
+
     path {
-        fill: darkgray;
+        fill: $highlight-torquise;
+        stroke: $highlight-torquise;
+        stroke-width: 1;
     }
 }
-
 
 svg.menu {
-    path
-    {
+    path {
         d: path("M 5 8 A 2.0002 2.0002 0 1 0 5 12 L 45 12 A 2.0002 2.0002 0 1 0 45 8 L 5 8 z M 5 23 A 2.0002 2.0002 0 1 0 5 27 L 45 27 A 2.0002 2.0002 0 1 0 45 23 L 5 23 z M 5 38 A 2.0002 2.0002 0 1 0 5 42 L 45 42 A 2.0002 2.0002 0 1 0 45 38 L 5 38 z");
     }
+}
+
+a:hover > svg.notes > path {
+    stroke-width: 3;
 }
