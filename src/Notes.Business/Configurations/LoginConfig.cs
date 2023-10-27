@@ -7,7 +7,7 @@ public class LoginConfig
     public string Email { get; set; } = default!;
     public string UserName { get; set; } = default!;
     public string Password { get; set; } = default!;
-    public TimeSpan TokenExpiry { get; set; } = TimeSpan.FromHours(1);
+    public TimeSpan Expiry { get; set; } = TimeSpan.FromHours(1);
 
     public void Validate()
     {

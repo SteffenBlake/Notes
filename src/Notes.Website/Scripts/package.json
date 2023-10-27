@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Front End for the Notes Application",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "webpack --config webpack.config.prod.js | strip-ansi",
     "build-dev": "webpack --config webpack.config.dev.js | strip-ansi",

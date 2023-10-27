@@ -2,10 +2,13 @@
 using Microsoft.Extensions.FileProviders;
 namespace Notes.Website.Middleware
 {
-    public static class IndexPageMiddleware
+    public static class StaticPageMiddleware
     {
-        public static Func<HttpContext, RequestDelegate, Task> Compile(IFileProvider webRoot)
+        public static RequestDelegate Compile(IFileProvider root, string filePath)
         {
+            var pagePath = Path.Combine("/pages/", filePath);
+            var page = root.GetFileInfo(pagePath);
+
             var cspBuilder = new StringBuilder();
             cspBuilder.Append("default-src 'none';");
             cspBuilder.Append("img-src 'self';");
@@ -14,33 +17,21 @@ namespace Notes.Website.Middleware
             cspBuilder.Append("style-src-elem 'self';");
             var cspHeader = cspBuilder.ToString();
 
-            var index = webRoot.GetFileInfo("index.html");
-
-            return (context, next) => MW_Delegate(context, next, cspHeader, index);
+            return (context) => MW_Delegate(context, cspHeader, page);
         }
 
         private static async Task MW_Delegate(
             HttpContext context, 
-            RequestDelegate next, 
             string cspHeader,
-            IFileInfo index
+            IFileInfo page
         )
         {
-            if (context.Request.Path.StartsWithSegments("/api"))
-            {
-                await next(context);
-                return;
-            }
-
             context.Response.OnStarting(AddCspHeaders(context, cspHeader));
 
             context.Response.ContentType = "text/html";
             context.Response.StatusCode = 200;
 
-            await using var indexStream = index.CreateReadStream();
-            await indexStream.CopyToAsync(context.Response.Body);
-
-            await context.Response.StartAsync();
+            await context.Response.SendFileAsync(page);
         }
 
         private static Func<Task> AddCspHeaders(HttpContext context, string cspHeader)

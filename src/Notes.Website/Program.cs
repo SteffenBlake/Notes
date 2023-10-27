@@ -1,14 +1,10 @@
 using System.Configuration;
 using System.Reflection;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Notes.Business;
 using Notes.Business.Configurations;
 using Notes.Business.Extensions;
 using Notes.Business.Services.Abstractions;
@@ -60,18 +56,22 @@ namespace Notes.Website
             }
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
+
+            var contentRoot = builder.Environment.ContentRootFileProvider;
+            app.MapGet("/login", StaticPageMiddleware.Compile(contentRoot, "login.html")).AllowAnonymous();
+            app.MapGet("/denied", StaticPageMiddleware.Compile(contentRoot, "denied.html")).AllowAnonymous();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
-
-            app.Use(IndexPageMiddleware.Compile(builder.Environment.WebRootFileProvider));
-
+            
             var pathGroup = app.MapGroup("/api/{**path}")
                 .RequireAuthorization()
-                .ExcludeFromDescription();
+                .ExcludeFromDescription()
+                .RequireAuthorization();
 
             pathGroup.MapGet("", 
                 async (string path, IContentService svc) => await svc.GetAsync(path)
@@ -79,6 +79,8 @@ namespace Notes.Website
             pathGroup.MapPut("",
                 async (string path, [FromBody]string data, IContentService svc) => await svc.PutAsync(path, data)
             );
+
+            app.MapFallback(StaticPageMiddleware.Compile(contentRoot, "index.html")).RequireAuthorization();
 
             await app.RunAsync();
         }
@@ -117,29 +119,6 @@ namespace Notes.Website
                         Url = new Uri("https://raw.githubusercontent.com/SteffenBlake/Notes/main/LICENSE")
                     }
                 });
-                options.AddSecurityDefinition("Bearer", new()
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Please insert JWT with Bearer into field",
-                    BearerFormat = "Bearer <token>",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
-                });
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        // scopes
-                        new string[] { }
-                    }
-                });
                 // using System.Reflection;
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
@@ -159,20 +138,13 @@ namespace Notes.Website
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<NotesDbContext>();
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
                 {
-                    var key = Encoding.UTF8.GetBytes(config.Signing.JWTSecret);
-                    options.TokenValidationParameters = new()
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = NotesConstants.JWT_ISSUER,
-                        ValidAudience = config.Urls,
-                        IssuerSigningKey = new SymmetricSecurityKey(key)
-                    };
+                    options.LoginPath = "/login";
+                    options.LogoutPath = "/api/logout";
+                    options.AccessDeniedPath = "/denied";
+                    options.ExpireTimeSpan = config.Login.Expiry;
                 });
         }
     }

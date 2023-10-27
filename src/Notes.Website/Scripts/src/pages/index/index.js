@@ -1,6 +1,6 @@
-import { NotesEditor } from "./ck-editor/notes-editor.js";
+import { NotesEditor } from "../../ck-editor/notes-editor.js";
 
-import "./notes.scss";
+import "../../styles/main.scss";
 
 async function init() {
     var editor = await NotesEditor.create(document.querySelector('#app'));

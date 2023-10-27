@@ -67,7 +67,7 @@ namespace Notes.Website.Controllers
             return Ok(new LoginResponseModel
             {
                 access_token = token,
-                expires_in = Config.Login.TokenExpiry.Ticks
+                expires_in = Config.Login.Expiry.Ticks
             });
         }
 
@@ -91,7 +91,7 @@ namespace Notes.Website.Controllers
                 issuer: NotesConstants.JWT_ISSUER,
                 audience: Config.Urls,
                 claims: principal.Claims,
-                expires: DateTime.Now + Config.Login.TokenExpiry,
+                expires: DateTime.Now + Config.Login.Expiry,
                 signingCredentials: signinCredentials
             );
 

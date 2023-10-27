@@ -399,3 +399,4 @@ FodyWeavers.xsd
 
 wwwroot
 /src/Notes.Website/Scripts/dist/
+*/Notes.Website/pages/

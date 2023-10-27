@@ -39,16 +39,6 @@
     <OutScripts Include="Scripts\dist\*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Scripts Remove="scripts\src\ck-editor\custom-style.scss" />
-    <Scripts Remove="Scripts\src\notes.scss" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="scripts\src\ck-editor\custom-style.scss" />
-    <UpToDateCheckInput Remove="Scripts\src\notes.scss" />
-  </ItemGroup>
-
   <Target Name="NpmInstall" Inputs="Scripts/package-lock.json" Outputs="Scripts/node_modules/.install-stamp" AfterTargets="PostBuildEvent">
     <Message Importance="high" Text="========= NPM Install ========= " />
     <MakeDir Directories="Scripts/node_modules" />
