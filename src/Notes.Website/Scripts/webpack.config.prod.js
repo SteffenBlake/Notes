@@ -1,16 +1,5 @@
-import { merge } from 'webpack-merge';
-import { baseConfig, fileManagerPlugin } from './webpack.config.js';
+import baseConfig from './webpack.config.js';
 
-import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
+baseConfig.mode = 'production';
 
-export default merge(baseConfig, {
-    mode: 'production',
-
-    plugins: [
-        new SubresourceIntegrityPlugin({
-            enabled: true,
-        }),
-
-        fileManagerPlugin
-    ],
-});
+export default baseConfig;

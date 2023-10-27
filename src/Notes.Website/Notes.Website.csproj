@@ -36,7 +36,6 @@
     <Scripts Include="Scripts\src\**\*" />
     <Scripts Include="Scripts\*.js" />
     <Scripts Include="Scripts\*.json" />
-    <OutScripts Include="Scripts\dist\*" />
   </ItemGroup>
 
   <Target Name="NpmInstall" Inputs="Scripts/package-lock.json" Outputs="Scripts/node_modules/.install-stamp" AfterTargets="PostBuildEvent">

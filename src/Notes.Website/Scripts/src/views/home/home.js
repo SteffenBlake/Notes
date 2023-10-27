@@ -1,9 +1,13 @@
-import { NotesEditor } from "../../ck-editor/notes-editor.js";
-
 import "../../styles/main.scss";
+import "./ck-editor-overrides.scss";
 
 async function init() {
-    var editor = await NotesEditor.create(document.querySelector('#app'));
+    var editor = await window.ClassicEditor.create(
+        document.querySelector('#app'), 
+        {
+            toolbar: []
+        }
+    );
 
     document.getElementById("skip-btn").addEventListener("click", () => editor.editing.view.focus());
 }
