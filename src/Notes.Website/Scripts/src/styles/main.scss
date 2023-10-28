@@ -26,7 +26,7 @@ header {
     height: 0;
 }
 
-$header-size: 40px;
+$header-size: 10vh;
 header > nav {
     margin-top: -$header-size;
     height: $header-size;
@@ -35,7 +35,7 @@ header > nav {
     justify-content: space-evenly;
     align-items: center;
     background-color: $background-blue;
-    z-index: 999;
+    z-index: 98;
     position: relative;
     transition-property: margin-top;
     transition-duration: 0.5s;
@@ -48,16 +48,28 @@ header > nav:focus-within {
 .navigation {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     align-items: center;
     flex-grow: 1;
+    padding: 0;
 }
 
 .navigation > li {
     list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    padding: 0 1vw;
+}
+.navigation > li:last-child {
+    flex-grow: 1;
+    flex-direction: row-reverse;
 }
 
-header a {
+.nav-ico {
+    max-height: $header-size;
+}
+
+header a, header button {
     text-decoration: none;
     color: $highlight-torquise;
     cursor: pointer;
@@ -68,12 +80,30 @@ header a {
     filter: drop-shadow(1px 1px 1px $notable-green);
     transform: translate(0px, 0px);
     transition: all 0.2s ease-in-out;
+    background: none;
+    border: none;
 }
 
 header a:hover {
     filter: drop-shadow(4px 2px 2px $notable-green);
     transform: translate(-1px, -2px);
-}    
+}
+
+.skip-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: 2vh;
+    padding: 1vh;
+    padding-left: 5vh;
+    z-index: 999;
+    background-color: $background-black;
+    border: solid 1px white;
+    transform: translateX(-105%);
+}
+.skip-btn:focus {
+    transform: translateX(-8%);
+}
 
 .menu-btn {
     position: absolute;
@@ -81,8 +111,9 @@ header a:hover {
     right: 0;
     cursor: pointer;
     z-index: 97;
-    height: $header-size;
-    width: $header-size;
+    height: $header-size - 3vh;
+    width: $header-size - 1vh;
+    margin: 1vh;
 }
 
 header > nav:focus-within + .menu-btn {

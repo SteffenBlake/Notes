@@ -38,6 +38,28 @@
     <Scripts Include="Scripts\*.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Scripts Remove="scripts\src\views\home\home.ejs" />
+    <Scripts Remove="scripts\src\views\home\home.js" />
+    <Scripts Remove="Scripts\src\views\note\note.ejs" />
+    <Scripts Remove="Scripts\src\views\note\note.js" />
+    <Scripts Remove="scripts\src\views\project\project.ejs" />
+    <Scripts Remove="Scripts\src\views\project\project.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="scripts\src\views\home\home.ejs" />
+    <UpToDateCheckInput Remove="scripts\src\views\home\home.js" />
+    <UpToDateCheckInput Remove="Scripts\src\views\note\note.ejs" />
+    <UpToDateCheckInput Remove="Scripts\src\views\note\note.js" />
+    <UpToDateCheckInput Remove="scripts\src\views\project\project.ejs" />
+    <UpToDateCheckInput Remove="Scripts\src\views\project\project.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Scripts\src\views\home\" />
+  </ItemGroup>
+
   <Target Name="NpmInstall" Inputs="Scripts/package-lock.json" Outputs="Scripts/node_modules/.install-stamp" AfterTargets="PostBuildEvent">
     <Message Importance="high" Text="========= NPM Install ========= " />
     <MakeDir Directories="Scripts/node_modules" />

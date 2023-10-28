@@ -64,22 +64,11 @@ namespace Notes.Website
             app.MapGet("/denied", StaticPageMiddleware.Compile("denied.html", config)).AllowAnonymous();
 
             app.UseAuthorization();
-
             app.MapControllers();
 
-            var pathGroup = app.MapGroup("/api/{**path}")
-                .RequireAuthorization()
-                .ExcludeFromDescription()
-                .RequireAuthorization();
-
-            pathGroup.MapGet("",
-                async (string path, IContentService svc) => await svc.GetAsync(path)
-            );
-            pathGroup.MapPut("",
-                async (string path, [FromBody] string data, IContentService svc) => await svc.PutAsync(path, data)
-            );
-
-            app.MapFallback(StaticPageMiddleware.Compile("index.html", config)).RequireAuthorization();
+            app.MapGet("", StaticPageMiddleware.Compile("index.html", config)).RequireAuthorization();
+            app.MapGet("{projectName}", StaticPageMiddleware.Compile("project.html", config)).RequireAuthorization();
+            app.MapFallback(StaticPageMiddleware.Compile("note.html", config)).RequireAuthorization();
 
             await app.RunAsync();
         }

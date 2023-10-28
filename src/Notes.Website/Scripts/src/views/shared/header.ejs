@@ -1,8 +1,11 @@
 <header>
+    <a id="skip-btn" class="skip-btn" href="#">Skip to Editor</a>
     <nav>
         <ul class="navigation">
             <li>
-                <a id="skip-btn" href="#">Skip to Editor</a>
+                <a href="/">
+                    <img class="nav-ico" src="../resources/favicon.ico" title="Notes Favicon" alt="Return to Projects"/>
+                </a>
             </li>
             <li>
                 <a id="config-btn" href="#">Config</a>
@@ -11,11 +14,13 @@
                 <a id="hotkeys-btn" href="#">Hotkeys</a>
             </li>
             <li>
-                <a id="logout-btn" href="#">Logout</a>
+                <form action="/api/auth/logout" method="post">
+                    <button type="submit" id="logout-btn">Logout</button>
+                </form>
             </li>
         </ul>
     </nav>
-    <a id="menu-btn" href="#hotkeys-btn" class="menu-btn">
+    <a id="menu-btn" href="#hotkeys-btn" class="menu-btn" tabindex="-1">
         <svg class="notes menu" viewBox="0 0 50 50"><path d=""></path></svg>
     </a>
 </header>

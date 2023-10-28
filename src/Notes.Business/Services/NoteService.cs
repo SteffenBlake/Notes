@@ -2,7 +2,7 @@
 
 namespace Notes.Business.Services
 {
-    public class ContentService : IContentService
+    public class NoteService : INoteService
     {
         public Task<string> GetAsync(string path)
         {

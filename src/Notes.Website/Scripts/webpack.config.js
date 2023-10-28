@@ -21,6 +21,20 @@ export default {
                         headerEnabled: true
                     }, 
                 },
+                project: {
+                    import: 'src/views/_layout.ejs',
+                    data: {
+                        page: 'project',
+                        headerEnabled: true
+                    },
+                },
+                note: {
+                    import: 'src/views/_layout.ejs',
+                    data: {
+                        page: 'note',
+                        headerEnabled: true
+                    },
+                },
                 login: {
                     import: 'src/views/_layout.ejs',
                     data: {
