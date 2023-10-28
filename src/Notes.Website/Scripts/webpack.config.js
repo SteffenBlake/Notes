@@ -52,7 +52,7 @@ export default {
                 onStart: {
                     delete: [
                         {
-                            source: '../wwwroot/*',
+                            source: '../wwwroot/notes/*',
                             options: {
                                 force: true
                             }
@@ -68,19 +68,19 @@ export default {
                 onEnd: {
                     copy: [
                         {
-                            source: path.resolve(__dirname, 'dist/scripts/*'),
-                            destination: path.resolve(__dirname, '../wwwroot/scripts/')
+                            source: path.resolve(__dirname, 'dist/notes/scripts/*'),
+                            destination: path.resolve(__dirname, '../wwwroot/notes/scripts/')
                         },
                         {
-                            source: path.resolve(__dirname, 'dist/styles/*'),
-                            destination: path.resolve(__dirname, '../wwwroot/styles/')
+                            source: path.resolve(__dirname, 'dist/notes/styles/*'),
+                            destination: path.resolve(__dirname, '../wwwroot/notes/styles/')
                         },
                         {
-                            source: path.resolve(__dirname, 'dist/assets/**/*'),
-                            destination: path.resolve(__dirname, '../wwwroot/assets/')
+                            source: path.resolve(__dirname, 'dist/notes/assets/**/*'),
+                            destination: path.resolve(__dirname, '../wwwroot/notes/assets/')
                         },
                         {
-                            source: path.resolve(__dirname, 'dist/*.html'),
+                            source: path.resolve(__dirname, 'dist/notes/*.html'),
                             destination: path.resolve(__dirname, '../pages')
                         }
                     ]
@@ -89,9 +89,9 @@ export default {
         })
     ],
     output: {
-        filename: 'scripts/[name].[chunkhash].js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/',
+        filename: 'scripts/notes/[name].[chunkhash].js',
+        path: path.resolve(__dirname, 'dist/notes/'),
+        publicPath: '/notes/',
         crossOriginLoading: "anonymous",
         clean: true
     },
