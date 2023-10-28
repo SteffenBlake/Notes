@@ -1,3 +1,18 @@
-<h1>Login</h1>
+<form action="/api/auth/login" method="post">
+    <h1>Login</h1>
+
+    <label for="username-input">Username</label>
+    <input type="text" id="username-input" name="username" placeholder="username" />
+
+    <label for="password-input">Username</label>
+    <input type="password" id="password-input" name="password" placeholder="password" />
+
+    <label for="remember-me-input">Remember Me</label>
+    <input type="checkbox" id="remember-me-input" name="rememberMe" value="true"/>
+
+    <input type="hidden" id="return-url-input" name="returnUrl" />
+
+    <button type="submit" id="login-btn">Submit</button>
+</form>
 
 <script src="login/login.js"></script>

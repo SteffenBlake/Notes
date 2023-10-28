@@ -1,29 +1,43 @@
 ﻿using System.Text;
 using Microsoft.Extensions.FileProviders;
+using Notes.Business.Configurations;
+
 namespace Notes.Website.Middleware
 {
     public static class StaticPageMiddleware
     {
-        public static RequestDelegate Compile(IFileProvider root, string filePath)
+        public static Delegate Compile(string filePath, NotesConfig config)
         {
             var pagePath = Path.Combine("/pages/", filePath);
-            var page = root.GetFileInfo(pagePath);
+
+            Dictionary<string, string[]> cspDict = new()
+            {
+                { "default-src", new []{"'none'"} },
+                { "img-src", new []{ "'self'" } },
+                { "font-src", new []{ "'self'" } },
+                { "style-src-elem", new []{ "'self'", "'unsafe-inline'" } },
+                { "script-src-elem", new []{ "'self' ", "https://cdn.ckeditor.com" } }
+            };
+
 
             var cspBuilder = new StringBuilder();
-            cspBuilder.Append("default-src 'none';");
-            cspBuilder.Append("img-src 'self';");
-            cspBuilder.Append("font-src 'self';");
-            cspBuilder.Append("script-src-elem 'self';");
-            cspBuilder.Append("style-src-elem 'self';");
+            foreach (var (directive, policies) in cspDict)
+            {
+                cspBuilder.Append($"{directive} {string.Join(' ', policies)};");
+            }
+
             var cspHeader = cspBuilder.ToString();
 
-            return (context) => MW_Delegate(context, cspHeader, page);
+
+            return (HttpContext context, IWebHostEnvironment env) =>
+                MW_Delegate(context, env, pagePath, cspHeader);
         }
 
         private static async Task MW_Delegate(
             HttpContext context, 
-            string cspHeader,
-            IFileInfo page
+            IWebHostEnvironment env, 
+            string pagePath, 
+            string cspHeader
         )
         {
             context.Response.OnStarting(AddCspHeaders(context, cspHeader));
@@ -31,7 +45,7 @@ namespace Notes.Website.Middleware
             context.Response.ContentType = "text/html";
             context.Response.StatusCode = 200;
 
-            await context.Response.SendFileAsync(page);
+            await context.Response.SendFileAsync(env.ContentRootFileProvider.GetFileInfo(pagePath));
         }
 
         private static Func<Task> AddCspHeaders(HttpContext context, string cspHeader)

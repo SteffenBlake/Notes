@@ -1,41 +1,43 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Text;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Notes.Business;
-using Notes.Business.Configurations;
 using Notes.Data.Models.Identity;
 using Notes.Website.Models.Login;
 
 namespace Notes.Website.Controllers
 {
+    /// <summary>
+    /// Endpoints for Authentication 
+    /// </summary>
     [AllowAnonymous]
     [ApiController]
-    [Route("api/[controller]")]
-    public class LoginController : ControllerBase
+    [Route("api/auth")]
+    public class AuthenticationController : ControllerBase
     {
-        private NotesConfig Config { get; }
         private SignInManager<NotesUser> SignInManager { get; }
-        private IUserClaimsPrincipalFactory<NotesUser> ClaimsPrincipal { get; }
 
-        public LoginController(
-            NotesConfig config, 
-            SignInManager<NotesUser> signInManager,
-            IUserClaimsPrincipalFactory<NotesUser> claimsPrincipal
+        /// <summary>
+        /// Endpoints for Authentication 
+        /// </summary>
+        public AuthenticationController(
+            SignInManager<NotesUser> signInManager
         )
         {
-            Config = config;
             SignInManager = signInManager;
-            ClaimsPrincipal = claimsPrincipal;
         }
 
+        /// <summary>
+        /// Logs in the current user via cookie based authorization
+        /// </summary>
         [ProducesResponseType(typeof(LoginResponseModel), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [HttpPost, Route("login")]
-        public async Task<IActionResult> Login(LoginRequestModel request)
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromForm]LoginRequestModel request)
         {
             if (
                 string.IsNullOrEmpty(request.UserName) ||
@@ -55,48 +57,47 @@ namespace Notes.Website.Controllers
                 return Unauthorized();
             }
 
-            var result = await SignInManager.PasswordSignInAsync(user, request.Password, request.RememberMe, true);
-
-            if (!result.Succeeded)
+            var signInResult = await SignInManager.CheckPasswordSignInAsync(user, request.Password, true);
+            if (!signInResult.Succeeded)
             {
                 return Unauthorized();
             }
 
-            var token = await CompileTokenAsync(user);
+            var claims = new List<Claim>();
+            claims.Add(new(ClaimTypes.NameIdentifier, user.Id));
+            claims.Add(new(ClaimTypes.Name, user.UserName!));
+            claims.Add(new(ClaimTypes.Email, user.Email!));
 
-            return Ok(new LoginResponseModel
+            var roles = await SignInManager.UserManager.GetRolesAsync(user);
+            foreach (var role in roles)
             {
-                access_token = token,
-                expires_in = Config.Login.Expiry.Ticks
-            });
-        }
+                claims.Add(new(ClaimTypes.Role, role));
+            }
 
-        [Authorize]
-        [HttpPost, Route("logout")]
-        [ProducesResponseType(200)]
-        public async Task<IActionResult> Logout()
-        {
-            await SignInManager.SignOutAsync();
-            return Ok();
-        }
-
-        private async Task<string> CompileTokenAsync(NotesUser user)
-        {
-            var secretUTF = Encoding.UTF8.GetBytes(Config.Signing.JWTSecret);
-            var secretKey = new SymmetricSecurityKey(secretUTF);
-            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-            var principal = await ClaimsPrincipal.CreateAsync(user);
-
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: NotesConstants.JWT_ISSUER,
-                audience: Config.Urls,
-                claims: principal.Claims,
-                expires: DateTime.Now + Config.Login.Expiry,
-                signingCredentials: signinCredentials
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme, 
+                principal, 
+                new AuthenticationProperties
+                {
+                    IsPersistent = request.RememberMe
+                }
             );
 
-            var token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-            return token;
+            return LocalRedirect(request.ReturnUrl ?? "/");
+        }
+
+        /// <summary>
+        /// Logs out the currently signed in user
+        /// </summary>
+        [Authorize]
+        [HttpPost("logout")]
+        [ProducesResponseType(302)]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return LocalRedirect("/login");
         }
     }
 }

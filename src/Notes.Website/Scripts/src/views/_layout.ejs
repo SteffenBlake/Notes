@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <title>Notes</title>
+    <link href="../resources/favicon.ico" rel="icon" />
+    <link href="../styles/main.scss" rel="stylesheet" />
 </head>
 <body>
-    <% if(headerEnabled) { include('./shared/header.ejs'); } %>
+    <% if (headerEnabled) { %>
+        <%- include('./shared/header.ejs'); %>
+    <% } %>
     <main>
         <%- include(`./${page}/${page}.ejs`); %>
     </main>

@@ -46,6 +46,8 @@ namespace Notes.Website
                 await dbInitService.InitAsync();
             }
 
+            app.UseAuthentication();
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -59,28 +61,26 @@ namespace Notes.Website
 
             app.UseStaticFiles();
 
-            var contentRoot = builder.Environment.ContentRootFileProvider;
-            app.MapGet("/login", StaticPageMiddleware.Compile(contentRoot, "login.html")).AllowAnonymous();
-            app.MapGet("/denied", StaticPageMiddleware.Compile(contentRoot, "denied.html")).AllowAnonymous();
+            app.MapGet("/login", StaticPageMiddleware.Compile("login.html", config)).AllowAnonymous();
+            app.MapGet("/denied", StaticPageMiddleware.Compile("denied.html", config)).AllowAnonymous();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
-            
+
             var pathGroup = app.MapGroup("/api/{**path}")
                 .RequireAuthorization()
                 .ExcludeFromDescription()
                 .RequireAuthorization();
 
-            pathGroup.MapGet("", 
+            pathGroup.MapGet("",
                 async (string path, IContentService svc) => await svc.GetAsync(path)
             );
             pathGroup.MapPut("",
-                async (string path, [FromBody]string data, IContentService svc) => await svc.PutAsync(path, data)
+                async (string path, [FromBody] string data, IContentService svc) => await svc.PutAsync(path, data)
             );
 
-            app.MapFallback(StaticPageMiddleware.Compile(contentRoot, "index.html")).RequireAuthorization();
+            app.MapFallback(StaticPageMiddleware.Compile("index.html", config)).RequireAuthorization();
 
             await app.RunAsync();
         }

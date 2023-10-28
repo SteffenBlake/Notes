@@ -2,7 +2,6 @@ import * as path from 'path';
 
 import ESLintPlugin from 'eslint-webpack-plugin';
 import HtmlBundlerPlugin from 'html-bundler-webpack-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import FileManagerPlugin from 'filemanager-webpack-plugin';
 
 import { fileURLToPath } from 'url';
@@ -77,6 +76,10 @@ export default {
                             destination: path.resolve(__dirname, '../wwwroot/styles/')
                         },
                         {
+                            source: path.resolve(__dirname, 'dist/assets/**/*'),
+                            destination: path.resolve(__dirname, '../wwwroot/assets/')
+                        },
+                        {
                             source: path.resolve(__dirname, 'dist/*.html'),
                             destination: path.resolve(__dirname, '../pages')
                         }
@@ -106,16 +109,5 @@ export default {
                 },
             },
         ],
-    },
-    // optimization automates minification for prod mode
-    optimization: {
-        minimizer: [
-            new CssMinimizerPlugin(),
-        ],
-        // splits css and js up so common file can exist to optimize
-        splitChunks: {
-            chunks: "initial",
-            name: 'commons'
-        }
-    },
+    }
 };
