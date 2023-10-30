@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Notes.Business.Models.Notes;
 using Notes.Business.Services.Abstractions;
 using Notes.Data;
 
 namespace Notes.Website.Controllers;
 
+/// <summary>
+/// Api group for handling of ICRUD for Projects and their notes
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
@@ -14,6 +18,9 @@ public class ProjectsController : ControllerBase
     private IProjectService ProjectService { get; }
     private INoteService NoteService { get; }
 
+    /// <summary>
+    /// Dependency Injections
+    /// </summary>
     public ProjectsController(NotesDbContext db, IProjectService projectService, INoteService noteService)
     {
         DB = db;
@@ -21,46 +28,69 @@ public class ProjectsController : ControllerBase
         NoteService = noteService;
     }
 
+    /// <summary>
+    /// Fetches the list of all Projects for a User
+    /// </summary>
     [HttpGet("")]
-    public IActionResult Index()
+    public IActionResult IndexProjects()
     {
         return Ok();
     }
 
-    [HttpPost("")]
-    public IActionResult CreateProject()
+    /// <summary>
+    /// Reads out the data for a specific Project by name
+    /// </summary>
+    /// <param name="projectName"></param>
+    [HttpGet("{projectName}")]
+    public IActionResult ReadProject(string projectName)
     {
         return Ok();
     }
 
-    [HttpGet("{projectId}")]
-    public IActionResult Read(string projectId)
+    /// <summary>
+    /// Adds or Updates a project to/in the system, by project name
+    /// </summary>
+    [HttpPut("{projectName}")]
+    public IActionResult PutProject(string projectName)
     {
         return Ok();
     }
 
-    [HttpPut("{projectId}")]
-    public IActionResult Update(string projectId)
+    /// <summary>
+    /// Deletes a project
+    /// </summary>
+    [HttpDelete("{projectName}")]
+    public IActionResult DeleteProject(string projectName)
     {
         return Ok();
     }
 
-    [HttpDelete("{projectId}")]
-    public IActionResult Delete(string projectId)
+    /// <summary>
+    /// Indexes all the notes for a given project by project name
+    /// </summary>
+    [HttpGet("{projectName}/notes")]
+    public IActionResult IndexNotes(string projectName)
     {
-        return Ok();
+        if (!NoteService.TryIndex(DB, projectName, out var indexModel) || indexModel == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(indexModel);
     }
 
-    [HttpGet("{projectId}/notes")]
-    public IActionResult IndexNotes(string projectId)
+    /// <summary>
+    /// Reads a specific note's data from a project, by project name and unique path for that note
+    /// </summary>
+    [HttpGet("{projectName}/notes/{**notePath}")]
+    public IActionResult ReadNote(string projectName, string notePath)
     {
-        return Ok();
-    }
+        if (!NoteService.TryGet(DB, projectName, notePath, out var readModel))
+        {
+            return BadRequest();
+        }
 
-    [HttpGet("{projectId}/notes/{**notePath}")]
-    public IActionResult ReadNote(string projectId, string notePath)
-    {
-        if (!NoteService.TryGet(DB, projectId, notePath, out var readModel))
+        if (readModel == null)
         {
             return NotFound();
         }
@@ -68,15 +98,41 @@ public class ProjectsController : ControllerBase
         return Ok(readModel);
     }
 
-    [HttpPut("{projectId}/notes/{**notePath}")]
-    public IActionResult CrupdateNote(string projectId, string notePath)
+    /// <summary>
+    /// Adds or Updates a note for a project, by project name and unique note path
+    /// </summary>
+    [HttpPut("{projectName}/notes/{**notePath}")]
+    public IActionResult PutNote(
+        [FromRoute]string projectName,
+        [FromRoute] string notePath, 
+        [FromBody]NoteWriteModel writeModel
+    )
     {
-        return Ok();
+        if (!NoteService.TryPut(DB, projectName, notePath, writeModel, out var readModel))
+        {
+            return BadRequest();
+        }
+
+        if (readModel == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(readModel);
     }
 
-    [HttpDelete("{projectId}/notes/{**notePath}")]
-    public IActionResult DeleteNote(string projectId, string notePath)
+    /// <summary>
+    /// Deletes a specific note for a project by project name and unique note path.
+    /// If the note has children beneath it's path, it's contents will just be cleared instead
+    /// </summary>
+    [HttpDelete("{projectName}/notes/{**notePath}")]
+    public IActionResult DeleteNote(string projectName, string notePath)
     {
+        if (!NoteService.TryDelete(DB, projectName, notePath))
+        {
+            return NotFound();
+        }
+
         return Ok();
     }
 }
