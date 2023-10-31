@@ -1,4 +1,4 @@
-﻿namespace Notes.Business.Services.Models.Notes;
+﻿namespace Notes.Business.Models.Notes;
 
 public class NoteIndexModel
 {

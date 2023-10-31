@@ -29,8 +29,4 @@
     <ProjectReference Include="..\Notes.Data\Notes.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mocks\" />
-  </ItemGroup>
-
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Notes.Business.Models.Notes;
+using Notes.Business.Models.Projects;
 using Notes.Business.Services.Abstractions;
 using Notes.Data;
 
@@ -34,34 +35,70 @@ public class ProjectsController : ControllerBase
     [HttpGet("")]
     public IActionResult IndexProjects()
     {
-        return Ok();
+        if (!ProjectService.TryIndex(DB, out var indexModel) || indexModel == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(indexModel);
     }
 
     /// <summary>
     /// Reads out the data for a specific Project by name
     /// </summary>
-    /// <param name="projectName"></param>
     [HttpGet("{projectName}")]
-    public IActionResult ReadProject(string projectName)
+    public IActionResult ReadProject(
+        [FromRoute] string projectName
+    )
     {
-        return Ok();
+        if (!ProjectService.TryGet(DB, projectName, out var readModel))
+        {
+            return BadRequest();
+        }
+
+        if (readModel == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(readModel);
     }
 
     /// <summary>
     /// Adds or Updates a project to/in the system, by project name
     /// </summary>
     [HttpPut("{projectName}")]
-    public IActionResult PutProject(string projectName)
+    public IActionResult PutProject(
+        [FromRoute]string projectName,
+        [FromBody]ProjectWriteModel writeModel
+    )
     {
-        return Ok();
+        if (!ProjectService.TryPut(DB, projectName, writeModel, out var readModel))
+        {
+            return BadRequest();
+        }
+
+        if (readModel == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(readModel);
     }
 
     /// <summary>
-    /// Deletes a project
+    /// Deletes a project. Throws an exception if the project has any notes associated with it.
     /// </summary>
     [HttpDelete("{projectName}")]
-    public IActionResult DeleteProject(string projectName)
+    public IActionResult DeleteProject(
+        [FromRoute] string projectName
+    )
     {
+        if (!ProjectService.TryDelete(DB, projectName))
+        {
+            return NotFound();
+        }
+
         return Ok();
     }
 
@@ -69,7 +106,9 @@ public class ProjectsController : ControllerBase
     /// Indexes all the notes for a given project by project name
     /// </summary>
     [HttpGet("{projectName}/notes")]
-    public IActionResult IndexNotes(string projectName)
+    public IActionResult IndexNotes(
+        [FromRoute] string projectName
+    )
     {
         if (!NoteService.TryIndex(DB, projectName, out var indexModel) || indexModel == null)
         {
@@ -83,7 +122,10 @@ public class ProjectsController : ControllerBase
     /// Reads a specific note's data from a project, by project name and unique path for that note
     /// </summary>
     [HttpGet("{projectName}/notes/{**notePath}")]
-    public IActionResult ReadNote(string projectName, string notePath)
+    public IActionResult ReadNote(
+        [FromRoute] string projectName, 
+        [FromRoute] string notePath
+    )
     {
         if (!NoteService.TryGet(DB, projectName, notePath, out var readModel))
         {
@@ -126,7 +168,10 @@ public class ProjectsController : ControllerBase
     /// If the note has children beneath it's path, it's contents will just be cleared instead
     /// </summary>
     [HttpDelete("{projectName}/notes/{**notePath}")]
-    public IActionResult DeleteNote(string projectName, string notePath)
+    public IActionResult DeleteNote(
+        [FromRoute] string projectName, 
+        [FromRoute] string notePath
+    )
     {
         if (!NoteService.TryDelete(DB, projectName, notePath))
         {

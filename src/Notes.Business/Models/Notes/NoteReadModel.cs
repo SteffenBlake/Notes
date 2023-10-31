@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Notes.Business.Models.Notes;
 using Notes.Data;
 using Notes.Data.Models;
 
-namespace Notes.Business.Services.Models.Notes;
+namespace Notes.Business.Models.Notes;
 
 public class NoteReadModel : NoteWriteModel
 {

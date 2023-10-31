@@ -15,8 +15,4 @@
     <ProjectReference Include="..\Notes.Data\Notes.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Projects\" />
-  </ItemGroup>
-
 </Project>

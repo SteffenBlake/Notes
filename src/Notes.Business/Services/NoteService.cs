@@ -1,13 +1,21 @@
 ﻿using Notes.Business.Models.Notes;
 using Notes.Business.Services.Abstractions;
-using Notes.Business.Services.Models.Notes;
 using Notes.Data;
 using Notes.Data.Models;
 
 namespace Notes.Business.Services;
 
+/// <inheritdoc />
 public class NoteService : INoteService
 {
+    private IHttpContextService HttpContext { get; }
+
+    public NoteService(IHttpContextService httpContext)
+    {
+        HttpContext = httpContext;
+    }
+
+    /// <inheritdoc />
     public bool TryIndex(NotesDbContext db, string projectName, out NoteIndexModel? indexModel)
     {
         if (string.IsNullOrEmpty(projectName))
@@ -15,7 +23,10 @@ public class NoteService : INoteService
             throw new ArgumentNullException(nameof(projectName));
         }
 
-        var project = db.Projects.SingleOrDefault(p => p.Name == projectName);
+        var project = db.Projects.SingleOrDefault(p => 
+            p.Name == projectName &&
+            p.UserId == HttpContext.UserId
+        );
         if (project == null)
         {
             indexModel = null;
@@ -34,6 +45,7 @@ public class NoteService : INoteService
         return true;
     }
 
+    /// <inheritdoc />
     public bool TryPut(NotesDbContext db, string projectName, string path, NoteWriteModel writeModel, out NoteReadModel? readModel)
     {
         if (string.IsNullOrEmpty(projectName))
@@ -45,7 +57,10 @@ public class NoteService : INoteService
             throw new ArgumentNullException(nameof(path));
         }
 
-        var projectId = db.Projects.Where(p => p.Name == projectName)
+        var projectId = db.Projects.Where(p => 
+                p.Name == projectName &&
+                p.UserId == HttpContext.UserId
+            )
             .Select(p => p.ProjectId)
             .SingleOrDefault();
         if (string.IsNullOrEmpty(projectId))
@@ -82,6 +97,7 @@ public class NoteService : INoteService
         return TryGet(db, projectName, path, out readModel);
     }
 
+    /// <inheritdoc />
     public bool TryGet(NotesDbContext db, string projectName, string path, out NoteReadModel? readModel)
     {
         if (string.IsNullOrEmpty(projectName))
@@ -108,6 +124,7 @@ public class NoteService : INoteService
         return true;
     }
     
+    /// <inheritdoc />
     public bool TryDelete(NotesDbContext db, string projectName, string path)
     {
         if (string.IsNullOrEmpty(projectName))
@@ -159,6 +176,7 @@ public class NoteService : INoteService
 
         var baseQuery = db.Notes.Where(n =>
             n.Project.Name == projectName &&
+            n.Project.UserId == HttpContext.UserId &&
             segmentsInternal.Contains(n.Name)
         ).ToDictionary(n => n.NoteId, n => n);
 

@@ -1,14 +1,15 @@
 ﻿using Notes.Business.Models.Notes;
 using Notes.Business.Services;
+using Notes.Business.Tests.Mocks;
 using Notes.Data.Models;
-using System.IO;
 
 namespace Notes.Business.Tests.Tests;
 
 [TestFixture]
-public class NoteServiceTest : TestBase<NoteService>
+public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
 {
     private const string ProjectName = nameof(ProjectName);
+    private const string ExistingUserId = nameof(ExistingUserId);
 
     protected override void Build(IServiceProvider services)
     {
@@ -18,7 +19,7 @@ public class NoteServiceTest : TestBase<NoteService>
         {
             ProjectId = "1",
             Name = ProjectName,
-            UserId = "1"
+            UserId = ExistingUserId
         });
         Db!.Notes.Add(new Note
         {
@@ -56,6 +57,8 @@ public class NoteServiceTest : TestBase<NoteService>
             ParentNoteId = "1"
         });
         Db.SaveChanges();
+
+        ServiceA!.UserId = ExistingUserId;
     }
 
 
@@ -164,19 +167,19 @@ public class NoteServiceTest : TestBase<NoteService>
         };
 
         var result = PrimaryService!.TryPut(Db!, ProjectName, "foo/alpha/beta", writeModel, out _);
-        var alpha = Db.Notes.SingleOrDefault(n => n.Name == "alpha");
+        var alpha = Db!.Notes.SingleOrDefault(n => n.Name == "alpha");
         var beta = Db.Notes.SingleOrDefault(n => n.Name == "beta");
 
         Assert.That(result, Is.True);
 
         Assert.That(alpha, Is.Not.Null);
-        Assert.That(alpha.ParentNoteId, Is.EqualTo("1"));
+        Assert.That(alpha!.ParentNoteId, Is.EqualTo("1"));
         Assert.That(alpha.ProjectId, Is.EqualTo("1"));
         Assert.That(alpha.ContentRaw, Is.Null);
         Assert.That(alpha.HtmlContent, Is.Null);
 
         Assert.That(beta, Is.Not.Null);
-        Assert.That(beta.ParentNoteId, Is.EqualTo(alpha.NoteId));
+        Assert.That(beta!.ParentNoteId, Is.EqualTo(alpha.NoteId));
         Assert.That(beta.ProjectId, Is.EqualTo("1"));
         Assert.That(beta.ContentRaw, Is.EqualTo("newRaw"));
         Assert.That(beta.HtmlContent, Is.EqualTo("newHtml"));
@@ -225,7 +228,7 @@ public class NoteServiceTest : TestBase<NoteService>
 
         Assert.That(result, Is.True);
         Assert.That(readModel, Is.Not.Null);
-        Assert.That(readModel.Id, Is.EqualTo(expectedId));
+        Assert.That(readModel!.Id, Is.EqualTo(expectedId));
         Assert.That(readModel.ParentId, Is.EqualTo(expectedParentId));
         Assert.That(readModel.HtmlContent, Is.EqualTo(expectedHtml));
         Assert.That(readModel.ContentRaw, Is.EqualTo(expectedRaw));
@@ -256,7 +259,7 @@ public class NoteServiceTest : TestBase<NoteService>
     public void TryDelete_ValidLeaf_Deletes()
     {
         var result = PrimaryService!.TryDelete(Db!, ProjectName, "foo/bar/phi");
-        var foo_bar_phi = Db.Notes.Find("3");
+        var foo_bar_phi = Db!.Notes.Find("3");
 
         Assert.That(result, Is.True);
         Assert.That(foo_bar_phi, Is.Null);
@@ -281,11 +284,11 @@ public class NoteServiceTest : TestBase<NoteService>
     )
     {
         var result = PrimaryService!.TryDelete(Db!, ProjectName, "foo/bar");
-        var checkNote = Db.Notes.Find(checkId);
+        var checkNote = Db!.Notes.Find(checkId);
 
         Assert.That(result, Is.True);
         Assert.That(checkNote, Is.Not.Null);
-        Assert.That(checkNote.Name, Is.EqualTo(expectedName));
+        Assert.That(checkNote!.Name, Is.EqualTo(expectedName));
         Assert.That(checkNote.ParentNoteId, Is.EqualTo(expectedParentId));
         Assert.That(checkNote.HtmlContent, Is.EqualTo(expectedHtml));
         Assert.That(checkNote.ContentRaw, Is.EqualTo(expectedRaw));

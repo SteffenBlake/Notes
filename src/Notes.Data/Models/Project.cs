@@ -4,6 +4,10 @@ namespace Notes.Data.Models;
 
 public class Project
 {
+    public Project()
+    {
+        ProjectId = Guid.NewGuid().ToString();
+    }
 
     [Key]
     public string ProjectId { get; set; } = null!;

@@ -39,6 +39,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\src\styles\denied.scss" />
+    <None Remove="Scripts\src\styles\home.scss" />
+    <None Remove="Scripts\src\styles\login.scss" />
+    <None Remove="Scripts\src\styles\note.scss" />
+    <None Remove="Scripts\src\styles\project.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Scripts Remove="Scripts\src\styles\denied.scss" />
+    <Scripts Remove="Scripts\src\styles\home.scss" />
+    <Scripts Remove="Scripts\src\styles\login.scss" />
+    <Scripts Remove="Scripts\src\styles\note.scss" />
+    <Scripts Remove="Scripts\src\styles\project.scss" />
     <Scripts Remove="scripts\src\views\home\home.ejs" />
     <Scripts Remove="scripts\src\views\home\home.js" />
     <Scripts Remove="Scripts\src\views\note\note.ejs" />
@@ -48,6 +61,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <UpToDateCheckInput Remove="Scripts\src\styles\denied.scss" />
+    <UpToDateCheckInput Remove="Scripts\src\styles\home.scss" />
+    <UpToDateCheckInput Remove="Scripts\src\styles\login.scss" />
+    <UpToDateCheckInput Remove="Scripts\src\styles\note.scss" />
+    <UpToDateCheckInput Remove="Scripts\src\styles\project.scss" />
     <UpToDateCheckInput Remove="scripts\src\views\home\home.ejs" />
     <UpToDateCheckInput Remove="scripts\src\views\home\home.js" />
     <UpToDateCheckInput Remove="Scripts\src\views\note\note.ejs" />

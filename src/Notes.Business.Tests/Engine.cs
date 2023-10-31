@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Notes.Business.Configurations;
 using Notes.Business.Services;
+using Notes.Business.Services.Abstractions;
+using Notes.Business.Tests.Mocks;
 using Notes.Data;
 
 namespace Notes.Business.Tests;
@@ -23,6 +25,8 @@ public static class Engine
 
         services.AddSingleton<NoteService>();
         services.AddSingleton<ProjectService>();
+
+        services.RegisterMock<IHttpContextService, MockHttpContextService>();
 
         return services.BuildServiceProvider();
     }
