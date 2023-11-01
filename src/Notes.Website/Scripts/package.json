@@ -15,7 +15,7 @@
     "css-loader": "^6.8.1",
     "ejs": "^3.1.9",
     "eslint-webpack-plugin": "^4.0.1",
-    "html-bundler-webpack-plugin": "^2.15.0",
+    "html-bundler-webpack-plugin": "^2.15.2",
     "sass": "^1.69.5",
     "sass-loader": "^13.3.2",
     "strip-ansi-cli": "^3.0.2",

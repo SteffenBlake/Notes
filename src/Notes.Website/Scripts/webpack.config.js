@@ -58,7 +58,10 @@ export default {
             },
             preprocessor: 'ejs',
             minify: 'auto',
-            //integrity: 'auto', // Seems to be bugged?
+            integrity: {
+                enabled: true,
+                hashFunctions: 'sha384',
+            },
 
         }),
         new FileManagerPlugin({
