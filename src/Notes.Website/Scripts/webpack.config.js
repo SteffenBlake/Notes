@@ -15,35 +15,35 @@ export default {
         new HtmlBundlerPlugin({
             entry: {
                 index: {
-                    import: 'src/views/_layout.ejs',
+                    import: 'src/_layout.ejs',
                     data: {
                         page: 'home',
                         headerEnabled: true
                     }, 
                 },
                 project: {
-                    import: 'src/views/_layout.ejs',
+                    import: 'src/_layout.ejs',
                     data: {
                         page: 'project',
                         headerEnabled: true
                     },
                 },
                 note: {
-                    import: 'src/views/_layout.ejs',
+                    import: 'src/_layout.ejs',
                     data: {
                         page: 'note',
                         headerEnabled: true
                     },
                 },
                 login: {
-                    import: 'src/views/_layout.ejs',
+                    import: 'src/_layout.ejs',
                     data: {
                         page: 'login',
                         headerEnabled: false
                     },
                 },
                 denied: {
-                    import: 'src/views/_layout.ejs',
+                    import: 'src/_layout.ejs',
                     data: {
                         page: 'denied',
                         headerEnabled: false

@@ -7,4 +7,5 @@
     "update": "cd Scripts && npm update",
     "ci": "cd Scripts && npm ci"
   }
+, "-vs-binding":{"ProjectOpened":["watch"]}
 }

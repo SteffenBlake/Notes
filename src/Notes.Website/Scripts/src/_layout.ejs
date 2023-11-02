@@ -3,15 +3,15 @@
 <head>
     <meta charset="utf-8">
     <title>Notes</title>
-    <link href="../resources/favicon.ico" rel="icon" />
-    <link href="../styles/main.scss" rel="stylesheet" />
+    <link href="resources/favicon.ico" rel="icon" />
+    <link href="styles/main.scss" rel="stylesheet" />
 </head>
 <body>
     <% if (headerEnabled) { %>
-        <%- include('./shared/header.ejs'); %>
+        <%- include('./views/shared/header.ejs'); %>
     <% } %>
     <main>
-        <%- include(`./${page}/${page}.ejs`); %>
+        <%- include(`./views/${page}/${page}.ejs`); %>
     </main>
     <footer>
     </footer>
