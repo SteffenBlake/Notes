@@ -2,11 +2,18 @@
 </div>
 
 <div id="new-project-modal" class="modal" data-show>
-    <label for="projectName">Project Name</label>
-    <input name="projectName" type="text" id="project-name-input"/>
     <form id="new-project-form">
-        <button type="button">Cancel</button>
-        <button type="submit">Create</button>
+        <div class="form-container">
+            <div class="form-section">
+                <label for="projectName">Project Name</label>
+                <input name="projectName" type="text" required />
+            </div>
+
+            <div class="form-buttons">
+                <button type="button" class="btn secondary" data-target="new-project-modal" data-toggle="hide">Cancel</button>
+                <button type="submit" class="btn success">Create</button>
+            </div>
+        </div>
     </form>
 </div>
 

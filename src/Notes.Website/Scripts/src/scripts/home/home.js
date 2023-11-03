@@ -1,8 +1,11 @@
 import { indexProjects, putProject } from '../api/projects-api.js';
+import { enableDataTags, serializeForm } from '../utilities.js';
 
 document.addEventListener("DOMContentLoaded", onLoaded);
 
 async function onLoaded() {
+    enableDataTags();
+
     var indexPromise = indexProjects();
 
     const container = document.getElementById(`projects-container`);
@@ -17,14 +20,26 @@ async function onLoaded() {
     });
 
     var addNew = projectBoxTemplate.content.cloneNode(true);
+
     addNew.querySelector(`h1`).innerHTML = `New Project`;
-    addNew.querySelector(`a`).href = `#project-name-input`;
+
+    var addNewAnchor = addNew.querySelector(`a`);
+    addNewAnchor.href = `#project-name-input`;
+    addNewAnchor.dataset.target = `new-project-modal`;
+    addNewAnchor.dataset.toggle = `show`;
+
     container.appendChild(addNew);
 
     document.getElementById(`new-project-form`).addEventListener(`submit`, onNewProject);
 }
 
 async function onNewProject(e) {
+    e.preventDefault();
+    var data = serializeForm(e.target);
+
+    await putProject(data.projectName, data);
+
+    window.location.href = `/${data.projectName}`;
 
     return false;
 }

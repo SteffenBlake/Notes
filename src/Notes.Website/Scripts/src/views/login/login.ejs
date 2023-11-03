@@ -1,18 +1,24 @@
 <form action="/api/auth/login" method="post">
-    <h1>Login</h1>
-
-    <label for="username-input">Username</label>
-    <input type="text" id="username-input" name="username" placeholder="username" />
-
-    <label for="password-input">Username</label>
-    <input type="password" id="password-input" name="password" placeholder="password" />
-
-    <label for="remember-me-input">Remember Me</label>
-    <input type="checkbox" id="remember-me-input" name="rememberMe" value="true"/>
-
     <input type="hidden" id="return-url-input" name="returnUrl" />
 
-    <button type="submit" id="login-btn">Submit</button>
+    <div class="form-container login-form modal show">
+        <h2>Login</h2>
+        <div class="form-section">
+            <label for="username-input">Username</label>
+            <input type="text" id="username-input" name="username" placeholder="username" />
+
+            <label for="password-input">Username</label>
+            <input type="password" id="password-input" name="password" placeholder="password" />
+            <div class="form-checkbox">
+                <label for="remember-me-input">Remember Me</label>
+                <input type="checkbox" id="remember-me-input" name="rememberMe" value="true" />
+            </div>
+        </div>
+
+        <div class="form-buttons">
+            <button type="submit" class="btn success" id="login-btn">Submit</button>
+        </div>
+    </div>
 </form>
 
 <script src="scripts/login/login.js"></script>
