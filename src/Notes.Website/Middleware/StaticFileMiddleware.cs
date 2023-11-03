@@ -13,6 +13,7 @@ namespace Notes.Website.Middleware
             Dictionary<string, string[]> cspDict = new()
             {
                 { "default-src", new []{"'none'"} },
+                { "connect-src", new []{ "'self'" } },
                 { "img-src", new []{ "'self'", "https://*" } },
                 { "font-src", new []{ "'self'" } },
                 { "style-src-elem", new []{ "'self'", "'unsafe-inline'" } },

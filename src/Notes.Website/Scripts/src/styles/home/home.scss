@@ -24,7 +24,7 @@
     transition: all 0.2s ease-in-out;
 }
 
-.project-box:hover {
+.project-box:hover, .project-box:focus-within {
     filter: drop-shadow(4px 3px 6px $notable-green);
     transform: translate(-3px, -6px);
 }
@@ -54,3 +54,4 @@
     height: 4vh;
     padding: 0 1vw;
 }
+

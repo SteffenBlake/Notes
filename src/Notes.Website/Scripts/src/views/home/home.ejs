@@ -1,19 +1,21 @@
-<div class="projects-container">
-    <div class="project-box">
-        <h1>Some Project</h1>
-        <a href="/some-project"></a>
-        <hr />
-    </div>
-    <div class="project-box">
-        <h1>Some Other Project</h1>
-        <a href="/some-other-project"></a>
-        <hr />
-    </div>
-    <div class="project-box">
-        <h1>A really really really long project name</h1>
-        <a href="/another-project"></a>
-        <hr />
-    </div>
+<div id="projects-container" class="projects-container">
 </div>
+
+<div id="new-project-modal" class="modal" data-show>
+    <label for="projectName">Project Name</label>
+    <input name="projectName" type="text" id="project-name-input"/>
+    <form id="new-project-form">
+        <button type="button">Cancel</button>
+        <button type="submit">Create</button>
+    </form>
+</div>
+
+<template id="project-box">
+    <div class="project-box">
+        <h1></h1>
+        <a href="#"></a>
+        <hr />
+    </div>
+</template>
 
 <script src="scripts/home/home.js"></script>

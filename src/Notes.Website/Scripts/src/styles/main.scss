@@ -126,6 +126,19 @@ header > nav:focus-within + .menu-btn {
     z-index: -1;
 }
 
+.modal {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    background-color: $background-blue;
+    border: 4px solid $highlight-torquise;
+    border-radius: 10px;
+    filter: drop-shadow(10px 10px 6px $notable-green);
+    transform: translate(-50%, -50%);
+    padding: 2vh 2vw;
+}
+
+
 svg.notes {
     width: 100%;
     height: 100%;
