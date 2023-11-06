@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Notes</title>
+    <link href="resources/favicon.ico" rel="icon" />
+    <link href="styles/main.scss" rel="stylesheet" />
+    <script src="scripts/_layout.js"></script>
+</head>
+<body class="d-flex flex-column">
+    <div class="d-none">
+        <%- include(`/node_modules/bootstrap-icons/bootstrap-icons.svg`); %>
+    </div>
+
+    <% if (headerEnabled) { %>
+        <%- include('/views/shared/header.ejs'); %>
+    <% } %>
+
+    <div class="container-xxl d-flex flex-fill">
+        <%- include(`/views/${page}/${page}.ejs`); %>
+    </div>
+
+    <%- include('/views/shared/footer.ejs'); %>
+</body>
+</html>

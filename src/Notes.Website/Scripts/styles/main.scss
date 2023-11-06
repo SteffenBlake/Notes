@@ -1,0 +1,28 @@
+﻿@import "bootstrap/scss/bootstrap";
+
+@import './denied/denied';
+@import './home/home';
+@import './login/login';
+@import './note/note';
+@import './project/project';
+
+html,
+body {
+    height: 100%;
+}
+
+.bi {
+    width: 1em;
+    height: 1em;
+    vertical-align: -.125em;
+    fill: currentcolor
+}
+
+.col-count-2 {
+    column-count: 2 !important;
+    column-width: 50% !important;
+}
+.col-count-3 {
+    column-count: 3 !important;
+    column-width: 33% !important;
+}

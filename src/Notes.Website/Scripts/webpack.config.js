@@ -15,35 +15,35 @@ export default {
         new HtmlBundlerPlugin({
             entry: {
                 index: {
-                    import: 'src/_layout.ejs',
+                    import: '_layout.ejs',
                     data: {
                         page: 'home',
                         headerEnabled: true
                     }, 
                 },
                 project: {
-                    import: 'src/_layout.ejs',
+                    import: '_layout.ejs',
                     data: {
                         page: 'project',
                         headerEnabled: true
                     },
                 },
                 note: {
-                    import: 'src/_layout.ejs',
+                    import: '_layout.ejs',
                     data: {
                         page: 'note',
                         headerEnabled: true
                     },
                 },
                 login: {
-                    import: 'src/_layout.ejs',
+                    import: '_layout.ejs',
                     data: {
                         page: 'login',
                         headerEnabled: false
                     },
                 },
                 denied: {
-                    import: 'src/_layout.ejs',
+                    import: '_layout.ejs',
                     data: {
                         page: 'denied',
                         headerEnabled: false
@@ -62,7 +62,6 @@ export default {
                 enabled: true,
                 hashFunctions: 'sha384',
             },
-
         }),
         new FileManagerPlugin({
             events: {

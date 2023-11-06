@@ -31,11 +31,34 @@
   </ItemGroup>
 
   <ItemGroup>
-    <UpToDateCheckInput Include="Scripts\src\**\*" />
     <UpToDateCheckInput Include="Scripts\*" />
-    <Scripts Include="Scripts\src\**\*" />
     <Scripts Include="Scripts\*.js" />
     <Scripts Include="Scripts\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Scripts\dist\**" />
+    <Compile Remove="Scripts\scripts\shared\**" />
+    <Content Remove="Scripts\dist\**" />
+    <Content Remove="Scripts\scripts\shared\**" />
+    <EmbeddedResource Remove="Scripts\dist\**" />
+    <EmbeddedResource Remove="Scripts\scripts\shared\**" />
+    <None Remove="Scripts\dist\**" />
+    <None Remove="Scripts\scripts\shared\**" />
+    <Scripts Remove="Scripts\dist\**" />
+    <Scripts Remove="Scripts\scripts\shared\**" />
+    <UpToDateCheckInput Remove="Scripts\dist\**" />
+    <UpToDateCheckInput Remove="Scripts\scripts\shared\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Scripts Remove="Scripts\scripts\_layout.js" />
+    <Scripts Remove="Scripts\views\shared\footer.ejs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Scripts\scripts\_layout.js" />
+    <UpToDateCheckInput Remove="Scripts\views\shared\footer.ejs" />
   </ItemGroup>
 
   <!-- Switched to Task Runner binding "Project Open" to "npm watch" instead -->
