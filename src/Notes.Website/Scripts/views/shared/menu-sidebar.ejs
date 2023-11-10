@@ -1,6 +1,6 @@
 ﻿<div class="offcanvas offcanvas-end flex-grow-1" tabindex="-1" id="bdNavbar" aria-labelledby="bdNavbarOffcanvasLabel" data-bs-scroll="true">
     <div class="offcanvas-header px-4 pb-0">
-        <h5 class="offcanvas-title" id="bdNavbarOffcanvasLabel">Bootstrap</h5>
+        <h3 class="offcanvas-title" id="bdNavbarOffcanvasLabel">Menu</h3>
         <button type="button" class="btn btn-outline-secondary btn-sm focus-ring" data-bs-dismiss="offcanvas" aria-label="Close" data-bs-target="#bdNavbar">
             <svg class="bi" aria-hidden="true"><use xlink:href="#x-lg"></use></svg>
         </button>
@@ -9,20 +9,47 @@
     <div class="offcanvas-body p-4 pt-0">
         <hr>
 
-        <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav">
+        <h4>Tools</h4>
+        <ul class="navbar-nav flex-column">
             <li class="nav-item col-6 col-lg-auto">
-                <a class="nav-link py-2 px-0 px-lg-2 icon-link" href="#" data-bs-toggle="modal" data-bs-target="#hotkeys-modal">
+                <a class="py-2 px-0 px-lg-2 icon-link" href="#" data-bs-toggle="modal" data-bs-target="#hotkeys-modal">
                     <svg class="bi" aria-hidden="true"><use xlink:href="#keyboard"></use></svg>
                     Hotkeys
+                </a>
+            </li>
+            <li class="nav-item col-6 col-lg-auto">
+                <a class="py-2 px-0 px-lg-2 icon-link" href="#" data-bs-toggle="modal" data-bs-target="#markdown-modal">
+                    <svg class="bi" aria-hidden="true"><use xlink:href="#hash"></use></svg>
+                    Markdown Guide
+                </a>
+            </li>
+            <li class="nav-item col-6 col-lg-auto">
+                <a class="py-2 px-0 px-lg-2 icon-link" href="#" data-bs-toggle="modal" data-bs-target="#markdown-modal">
+                    <svg class="bi" aria-hidden="true"><use xlink:href="#bezier2"></use></svg>
+                    Project Map
+                </a>
+            </li>
+            <li class="nav-item col-6 col-lg-auto">
+                <a class="py-2 px-0 px-lg-2 icon-link" href="#" data-bs-toggle="modal" data-bs-target="#markdown-modal">
+                    <svg class="bi" aria-hidden="true"><use xlink:href="#view-list"></use></svg>
+                    History
+                </a>
+            </li>
+            <li class="nav-item col-6 col-lg-auto">
+                <a class="py-2 px-0 px-lg-2 icon-link" href="#" data-bs-toggle="modal" data-bs-target="#markdown-modal">
+                    <svg class="bi" aria-hidden="true"><use xlink:href="#at"></use></svg>
+                    Tags
                 </a>
             </li>
         </ul>
 
         <hr>
 
-        <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
+        <h4>About Us</h4>
+
+        <ul class="navbar-nav flex-row flex-wrap">
             <li class="nav-item col-6 col-lg-auto">
-                <a class="nav-link py-2 px-0 px-lg-2" href="https://github.com/SteffenBlake/Notes" target="_blank" rel="noopener">
+                <a class="py-2 px-0 px-lg-2" href="https://github.com/SteffenBlake/Notes" target="_blank" rel="noopener">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="navbar-nav-svg" viewBox="0 0 512 499.36" role="img">
                         <title>GitHub</title>
                         <use href="#github"></use>
@@ -31,11 +58,15 @@
                 </a>
             </li>
 
-            <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+            <!-- <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
                 <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
                 <hr class="my-2 text-white-50">
-            </li>
+            </li> -->
+        </ul>
+        
+        <hr>
 
+        <ul class="navbar-nav flex-column">
             <li class="nav-item dropdown">
                 <button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme (dark)">
                     <svg class="bi my-1 theme-icon-active"><use href="#moon-stars-fill"></use></svg>

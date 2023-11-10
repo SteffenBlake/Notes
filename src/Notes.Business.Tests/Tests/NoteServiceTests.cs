@@ -6,7 +6,7 @@ using Notes.Data.Models;
 namespace Notes.Business.Tests.Tests;
 
 [TestFixture]
-public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
+public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, MockEditHistoryService>
 {
     private const string ProjectName = nameof(ProjectName);
     private const string ExistingUserId = nameof(ExistingUserId);
@@ -27,7 +27,8 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
             Name = "foo",
             ProjectId = "1",
             HtmlContent = "foo",
-            ContentRaw = "foo"
+            ContentRaw = "foo",
+            Route = $"/{ProjectName}/foo"
         });
         Db!.Notes.Add(new Note
         {
@@ -37,6 +38,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
             HtmlContent = "foo/bar",
             ContentRaw = "foo/bar",
             ParentNoteId = "1",
+            Route = $"/{ProjectName}/foo/bar"
         });
         Db!.Notes.Add(new Note
         {
@@ -45,7 +47,8 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
             ProjectId = "1",
             HtmlContent = "foo/bar/phi",
             ContentRaw = "foo/bar/phi",
-            ParentNoteId = "2"
+            ParentNoteId = "2",
+            Route = $"/{ProjectName}/foo/bar/phi"
         });
         Db!.Notes.Add(new Note
         {
@@ -54,7 +57,8 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
             ProjectId = "1",
             HtmlContent = "foo/phi",
             ContentRaw = "foo/phi",
-            ParentNoteId = "1"
+            ParentNoteId = "1",
+            Route = $"/{ProjectName}/foo/phi"
         });
         Db.SaveChanges();
 
@@ -123,10 +127,10 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
 
     public static object[] Put_ExistingPath_Idemptotent_Cases =
     {
-        new object?[] { "foo", "1", "foo", null, "foo", "foo" },
-        new object?[] { "foo/bar", "2", "bar", "1", "newRaw", "newHtml" },
-        new object?[] { "foo/bar/phi", "3", "phi", "2", "foo/bar/phi", "foo/bar/phi" },
-        new object?[] { "foo/phi", "4", "phi", "1", "foo/phi", "foo/phi" }
+        new object?[] { "foo", "1", "foo", null, "foo", "foo", $"/{ProjectName}/foo" },
+        new object?[] { "foo/bar", "2", "bar", "1", "newRaw", "newHtml", $"/{ProjectName}/foo/bar" },
+        new object?[] { "foo/bar/phi", "3", "phi", "2", "foo/bar/phi", "foo/bar/phi", $"/{ProjectName}/foo/bar/phi" },
+        new object?[] { "foo/phi", "4", "phi", "1", "foo/phi", "foo/phi", $"/{ProjectName}/foo/phi" }
     };
 
     [Test]
@@ -137,7 +141,8 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
         string expectedName, 
         string expectedParentId,
         string expectedRaw, 
-        string expectedHtml
+        string expectedHtml,
+        string expectedRoute
     )
     {
         var writeModel = new NoteWriteModel
@@ -155,6 +160,9 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
         Assert.That(checkedNote.Name, Is.EqualTo(expectedName));
         Assert.That(checkedNote.ContentRaw, Is.EqualTo(expectedRaw));
         Assert.That(checkedNote.HtmlContent, Is.EqualTo(expectedHtml));
+        Assert.That(checkedNote.Route, Is.EqualTo(expectedRoute));
+
+        Assert.That(ServiceB!.NoteEvents, Is.EqualTo(1));
     }
 
     [Test]
@@ -177,12 +185,16 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService>
         Assert.That(alpha.ProjectId, Is.EqualTo("1"));
         Assert.That(alpha.ContentRaw, Is.Null);
         Assert.That(alpha.HtmlContent, Is.Null);
+        Assert.That(alpha.Route, Is.EqualTo($"/{ProjectName}/foo/alpha"));
 
         Assert.That(beta, Is.Not.Null);
         Assert.That(beta!.ParentNoteId, Is.EqualTo(alpha.NoteId));
         Assert.That(beta.ProjectId, Is.EqualTo("1"));
         Assert.That(beta.ContentRaw, Is.EqualTo("newRaw"));
         Assert.That(beta.HtmlContent, Is.EqualTo("newHtml"));
+        Assert.That(beta.Route, Is.EqualTo($"/{ProjectName}/foo/alpha/beta"));
+
+        Assert.That(ServiceB!.NoteEvents, Is.EqualTo(1));
     }
 
     [TestCase("", "")]

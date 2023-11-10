@@ -11,7 +11,9 @@ public class NotesDbContext : IdentityDbContext<NotesUser>
     {
     }
 
+    public DbSet<WebsiteConfiguration> WebsiteConfiguration { get; set; } = default!;
     public DbSet<Project> Projects { get; set; } = default!;
     public DbSet<Note> Notes { get; set; } = default!;
     public DbSet<NoteLink> NoteLinks { get; set; } = default!;
+    public DbSet<EditHistory> EditHistory { get; set; } = default!;
 }

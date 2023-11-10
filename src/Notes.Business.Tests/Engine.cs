@@ -25,8 +25,10 @@ public static class Engine
 
         services.AddSingleton<NoteService>();
         services.AddSingleton<ProjectService>();
+        services.AddSingleton<DirectoryService>();
 
         services.RegisterMock<IHttpContextService, MockHttpContextService>();
+        services.RegisterMock<IEditHistoryService, MockEditHistoryService>();
 
         return services.BuildServiceProvider();
     }

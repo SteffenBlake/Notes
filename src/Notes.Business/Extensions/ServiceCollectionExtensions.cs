@@ -11,6 +11,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDatabaseInitService, DatabaseInitService>();
         services.AddTransient<INoteService, NoteService>();
         services.AddTransient<IProjectService, ProjectService>();
+        services.AddTransient<IDirectoryService, DirectoryService>();
+        services.AddTransient<IEditHistoryService, EditHistoryService>();
         services.AddTransient<IHttpContextService, HttpContextService>();
     }
 }

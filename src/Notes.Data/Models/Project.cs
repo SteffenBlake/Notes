@@ -17,4 +17,8 @@ public class Project
 
     [Required]
     public string UserId { get; set; } = null!;
+
+    public string? Description { get; set; } = null;
+
+    public string Icon { get; set; } = "journal";
 }

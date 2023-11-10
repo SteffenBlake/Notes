@@ -1,0 +1,33 @@
+.directory-nav {
+    ul {
+        list-style: none;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    li {
+        padding-left: 1em;
+        text-indent: -1em;
+    }
+
+    li:not(.expand) > ul {
+        display: none;
+    }
+
+    li:not(.expand)>button>.down {
+        display: none;
+    }
+    li.expand>button>.right {
+        display: none;
+    }
+
+    li:before {
+        content: "└";
+        padding-right: 5px;
+    }
+
+    li:not(.expand):not(:last-child):before {
+        content: "├";
+        padding-right: 5px;
+    }
+}

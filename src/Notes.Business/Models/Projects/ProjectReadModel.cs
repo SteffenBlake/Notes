@@ -18,6 +18,8 @@ public class ProjectReadModel : ProjectWriteModel
         {
             ProjectId = project.ProjectId,
             Name = project.Name,
+            Description = project.Description,
+            Icon = project.Icon,
             CanDelete = !db.Notes.Any(n => n.ProjectId == project.ProjectId)
         };
     }

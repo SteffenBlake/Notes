@@ -38,6 +38,9 @@ async function init() {
         }
     );
 
+    editor.keystrokes.set('Ctrl+L', 'removeFormat');
+    editor.keystrokes.set('Ctrl+L', 'removeFormat');
+
     document.getElementById("skip-btn").addEventListener("click", () => editor.editing.view.focus());
 }
 

@@ -10,9 +10,12 @@ public class NoteService : INoteService
 {
     private IHttpContextService HttpContext { get; }
 
-    public NoteService(IHttpContextService httpContext)
+    private IEditHistoryService EditHistory { get; }
+
+    public NoteService(IHttpContextService httpContext, IEditHistoryService editHistory)
     {
         HttpContext = httpContext;
+        EditHistory = editHistory;
     }
 
     /// <inheritdoc />
@@ -57,6 +60,8 @@ public class NoteService : INoteService
             throw new ArgumentNullException(nameof(path));
         }
 
+        var user = db.Users.Find(HttpContext.UserId)!;
+
         var projectId = db.Projects.Where(p => 
                 p.Name == projectName &&
                 p.UserId == HttpContext.UserId
@@ -71,28 +76,32 @@ public class NoteService : INoteService
 
         if (
             !TryGetInternal(db, projectName, path, out var heirarchy, out var segments) ||
-            heirarchy.FirstOrDefault() == null
+            heirarchy.LastOrDefault() == null
         )
         {
             for (var i = 0; i < heirarchy.Length; i++)
             {
+                var route = $"/{projectName}/{string.Join('/', segments[..(i+1)])}";
                 heirarchy[i] ??= db.Notes.Add(new Note
                 {
                     Name = segments[i],
-                    ProjectId = projectId
+                    ProjectId = projectId,
+                    Route = route
                 }).Entity;
 
                 if (i == 0)
                 {
                     continue;
                 }
-                heirarchy[i - 1]!.ParentNoteId ??= heirarchy[i]!.NoteId;
+                heirarchy[i]!.ParentNoteId ??= heirarchy[i -1]!.NoteId;
             }
         }
 
-        writeModel.Write(db, heirarchy[0]!);
+        writeModel.Write(db, user, heirarchy[^1]!);
 
         db.SaveChanges();
+
+        EditHistory.AddNoteEvent(db, heirarchy[0]!.NoteId);
 
         return TryGet(db, projectName, path, out readModel);
     }
@@ -112,7 +121,7 @@ public class NoteService : INoteService
         Note? note;
         if (
             !TryGetInternal(db, projectName, path, out var heirarchy, out _) ||
-            (note = heirarchy.FirstOrDefault()) == null
+            (note = heirarchy.LastOrDefault()) == null
         )
         {
             readModel = null;
@@ -139,7 +148,7 @@ public class NoteService : INoteService
         Note? note;
         if (
             !TryGetInternal(db, projectName, path, out var heirarchy, out _) ||
-            (note = heirarchy.FirstOrDefault()) == null
+            (note = heirarchy.LastOrDefault()) == null
         )
         {
             return false;
@@ -167,7 +176,6 @@ public class NoteService : INoteService
             .Segments
             .Select(s => s.Replace('/', ' ').Trim())
             .Where(s => !string.IsNullOrEmpty(s))
-            .Reverse()
             .ToList();
 
         segments = segmentsInternal.ToArray();
@@ -181,24 +189,24 @@ public class NoteService : INoteService
         ).ToDictionary(n => n.NoteId, n => n);
 
         // Get the matching root note
-        var note = baseQuery.SingleOrDefault(n => n.Value.ParentNoteId == null && n.Value.Name == segmentsInternal[^1]).Value;
+        var note = baseQuery.SingleOrDefault(n => n.Value.ParentNoteId == null && n.Value.Name == segmentsInternal[0]).Value;
         if (note == null)
         {
             return false;
         }
 
-        heirarchy[^1] = note;
+        heirarchy[0] = note;
 
-        for (var i = 2; i <= segmentsInternal.Count; i++)
+        for (var i = 1; i < segmentsInternal.Count; i++)
         {
             var noteId = note.NoteId;
-            note = baseQuery.SingleOrDefault(n => n.Value.ParentNoteId == noteId && n.Value.Name == segmentsInternal[^i]).Value;
+            note = baseQuery.SingleOrDefault(n => n.Value.ParentNoteId == noteId && n.Value.Name == segmentsInternal[i]).Value;
             if (note == null)
             {
                 return false;
             }
 
-            heirarchy[^i] = note;
+            heirarchy[i] = note;
         }
 
         return true;

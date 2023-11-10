@@ -4,7 +4,7 @@ using Notes.Business.Tests.Mocks;
 using Notes.Data.Models;
 
 namespace Notes.Business.Tests.Tests;
-internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextService>
+internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextService, MockEditHistoryService>
 {
     private const string ExistingUserId = nameof(ExistingUserId);
 
@@ -72,6 +72,8 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
         Assert.That(readModel.CanDelete, Is.True);
         Assert.That(added, Is.Not.Null);
         Assert.That(added!.UserId, Is.EqualTo(ExistingUserId));
+
+        Assert.That(ServiceB!.ProjectEvents, Is.EqualTo(1));
     }
 
     [Test]
@@ -84,6 +86,8 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
         Assert.That(result, Is.True);
         Assert.That(readModel!.Name, Is.EqualTo(nameof(Project_WithNotes)));
         Assert.That(added, Is.Not.Null);
+
+        Assert.That(ServiceB!.ProjectEvents, Is.EqualTo(1));
     }
 
     [Test]

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Notes.Data.Models.Identity;
 
 namespace Notes.Data.Models;
 
@@ -18,6 +19,7 @@ public class Note
     public string? ParentNoteId { get; set; }
 
     public Project Project { get; set; }
+
     [Required]
     public string ProjectId { get; set; } = null!;
 
@@ -25,4 +27,9 @@ public class Note
 
     public string? ContentRaw { get; set; }
 
+    [Required]
+    public string Icon { get; set; } = "file-earmark";
+
+    [Required]
+    public string Route { get; set; } = "";
 }

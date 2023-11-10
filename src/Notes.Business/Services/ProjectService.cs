@@ -10,9 +10,12 @@ public class ProjectService : IProjectService
 {
     private IHttpContextService HttpContext { get; }
 
-    public ProjectService(IHttpContextService httpContext)
+    private IEditHistoryService EditHistory { get; }
+
+    public ProjectService(IHttpContextService httpContext, IEditHistoryService editHistory)
     {
         HttpContext = httpContext;
+        EditHistory = editHistory;
     }
 
     ///<inheritdoc />
@@ -56,11 +59,14 @@ public class ProjectService : IProjectService
             new Project
             {
                 Name = projectName,
-                UserId = HttpContext.UserId
+                UserId = HttpContext.UserId!
             }).Entity;
 
-        writeModel.Write(db, project);
+        writeModel.Write(db, HttpContext.UserId, project);
+
         db.SaveChanges();
+
+        EditHistory.AddProjectEvent(db, project.ProjectId);
 
         return TryGet(db, projectName, out readModel);
     }
