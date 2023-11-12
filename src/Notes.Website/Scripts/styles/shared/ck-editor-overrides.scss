@@ -97,6 +97,10 @@ $highlight-torquise: #008170;
     /* -- Generic colors ------------------------------------------------------------------------- */
 
     --ck-color-light-red: hsl(0, 100%, 90%);
+
+    // https://ckeditor.com/docs/ckeditor5/latest/installation/integrations/css.html#bootstrap-modals
+    --ck-z-default: 100;
+    --ck-z-modal: calc( var(--ck-z-default) + 999 );
 }
 
 .ck-editor, .ck-editor__main {

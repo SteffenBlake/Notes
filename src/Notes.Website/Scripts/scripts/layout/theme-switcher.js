@@ -64,7 +64,7 @@ function onThemeToggle(e) {
     showActiveTheme(theme, true);
 }
 
-export function init() {
+export async function initAsync() {
     var preferred = getPreferredTheme();
     setTheme(preferred);
 

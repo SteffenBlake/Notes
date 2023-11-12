@@ -1,11 +1,20 @@
 import * as bootstrap from 'bootstrap';
+fixBootstrapModalFocusTraps();
 
-import { init as themeSwitcherInit } from './theme-switcher.js';
+import { initAsync as themeSwitcherInitAsync } from './theme-switcher.js';
+import { initAsync as dataTriggersInitAsync } from './data-triggers.js';
 
 (() => {
-    addEventListener("DOMContentLoaded", init);
+    addEventListener("DOMContentLoaded", initAsync);
 })()
 
-function init() {
-    themeSwitcherInit();
+async function initAsync() {
+    await Promise.all([
+        themeSwitcherInitAsync(),
+        dataTriggersInitAsync()
+    ]);
+}
+
+function fixBootstrapModalFocusTraps() {
+    bootstrap.Modal.prototype._initializeFocusTrap = function () { return { activate: function () { }, deactivate: function () { } } };
 }

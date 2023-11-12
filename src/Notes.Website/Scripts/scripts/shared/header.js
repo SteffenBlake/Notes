@@ -1,4 +1,5 @@
 import { initAsync as navigationSidebarInitAsync } from './navigation-sidebar.js';
+import { initAsync as CreateNewModalInitAsync } from './create-new-modal.js';
 
 (() => {
     addEventListener("DOMContentLoaded", initAsync);
@@ -7,6 +8,7 @@ import { initAsync as navigationSidebarInitAsync } from './navigation-sidebar.js
 async function initAsync() {
 
     await Promise.all([
-        navigationSidebarInitAsync()
+        navigationSidebarInitAsync(),
+        CreateNewModalInitAsync()
     ]);
 }
