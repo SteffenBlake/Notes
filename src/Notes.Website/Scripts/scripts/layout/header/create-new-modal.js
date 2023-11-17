@@ -1,4 +1,4 @@
-import { initAsync as editorInitAsync } from "../shared/ckEditor.js";
+import { initAsync as editorInitAsync } from "../../shared/ckEditor.js";
 
 export async function initAsync() 
 {

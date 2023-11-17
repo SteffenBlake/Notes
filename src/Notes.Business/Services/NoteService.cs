@@ -19,7 +19,7 @@ public class NoteService : INoteService
     }
 
     /// <inheritdoc />
-    public bool TryIndex(NotesDbContext db, string projectName, out NoteIndexModel? indexModel)
+    public bool TryIndex(in NotesDbContext db, string projectName, out NoteIndexModel? indexModel)
     {
         if (string.IsNullOrEmpty(projectName))
         {
@@ -49,7 +49,7 @@ public class NoteService : INoteService
     }
 
     /// <inheritdoc />
-    public bool TryPut(NotesDbContext db, string projectName, string path, NoteWriteModel writeModel, out NoteReadModel? readModel)
+    public bool TryPut(in NotesDbContext db, string projectName, string path, in NoteWriteModel writeModel, out NoteReadModel? readModel)
     {
         if (string.IsNullOrEmpty(projectName))
         {
@@ -107,7 +107,7 @@ public class NoteService : INoteService
     }
 
     /// <inheritdoc />
-    public bool TryGet(NotesDbContext db, string projectName, string path, out NoteReadModel? readModel)
+    public bool TryGet(in NotesDbContext db, string projectName, string path, out NoteReadModel? readModel)
     {
         if (string.IsNullOrEmpty(projectName))
         {
@@ -134,7 +134,7 @@ public class NoteService : INoteService
     }
     
     /// <inheritdoc />
-    public bool TryDelete(NotesDbContext db, string projectName, string path)
+    public bool TryDelete(in NotesDbContext db, string projectName, string path)
     {
         if (string.IsNullOrEmpty(projectName))
         {
@@ -168,7 +168,7 @@ public class NoteService : INoteService
         return true;
     }
 
-    private bool TryGetInternal(NotesDbContext db, string projectName, string path, out Note?[] heirarchy, out string[] segments)
+    private bool TryGetInternal(in NotesDbContext db, string projectName, string path, out Note?[] heirarchy, out string[] segments)
     {
         // this seems to be the cleanest way to achieve our desired result
         // of splitting up a uri path into segments

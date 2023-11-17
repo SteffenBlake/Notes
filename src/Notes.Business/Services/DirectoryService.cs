@@ -20,7 +20,7 @@ public class DirectoryService : IDirectoryService
     }
 
     ///<inheritdoc />
-    public bool TryGetRecent(NotesDbContext db, out DirectoryRecentReadModel readModel, int skip = 0, int take = 5)
+    public bool TryGetRecent(in NotesDbContext db, out DirectoryRecentReadModel readModel, int skip = 0, int take = 5)
     {
         var recent = EditHistory.GetHistory(db, skip, take)
             .Select(DirectoryReadModel.Read(db))
@@ -35,7 +35,7 @@ public class DirectoryService : IDirectoryService
     }
 
     ///<inheritdoc />
-    public bool TryGetOverview(NotesDbContext db, string directoryId, out DirectoryOverviewReadModel readModel)
+    public bool TryGetOverview(in NotesDbContext db, string directoryId, out DirectoryOverviewReadModel readModel)
     {
         readModel = new();
 
@@ -98,7 +98,7 @@ public class DirectoryService : IDirectoryService
     }
 
     ///<inheritdoc />
-    public bool TryGetDescendants(NotesDbContext db, string directoryId, out DirectoryDescendantsReadModel readModel)
+    public bool TryGetDescendants(in NotesDbContext db, string directoryId, out DirectoryDescendantsReadModel readModel)
     {
         var descendants = db.EditHistory
             .Include(h => h.Note)

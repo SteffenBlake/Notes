@@ -1,4 +1,4 @@
-import {getRecentAsync, getOverviewAsync, getDescendantsAsync} from '../api/directories-api.js'
+import {getRecentAsync, getOverviewAsync, getDescendantsAsync} from '../../api/directories-api.js'
 
 export async function initAsync() 
 {

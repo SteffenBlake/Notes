@@ -1,4 +1,4 @@
-import baseConfig from './webpack.config.js';
+import baseConfig from './configuration/webpack.config.js';
 
 baseConfig.mode = 'production';
 

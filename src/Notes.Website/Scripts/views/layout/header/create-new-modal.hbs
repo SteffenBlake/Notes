@@ -1,0 +1,27 @@
+{{#> modal id='create-new-modal' title='Create New...'}}
+<div class="d-flex flex-column h-100">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#" data-bs-toggle="tab"
+                data-bs-target="#create-project-pane" id="create-project-tab"
+                aria-controls="create-project-pane" aria-selected="true">Project</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#create-note-pane"
+                id="create-note-tab" aria-controls="create-note-pane" aria-selected="false">Note</a>
+        </li>
+    </ul>
+
+    <div class="tab-content w-100 pt-3 flex-grow-1">
+        <div class="tab-pane h-100 active" id="create-project-pane" role="tabpanel"
+            aria-labelledby="create-project-tab">
+            {{> projectForm }}
+        </div>
+
+        <div class="tab-pane w-75" id="create-note-pane" role="tabpanel" aria-labelledby="create-note-tab"
+            tabindex="0">
+            {{> noteForm }}
+        </div>
+    </div>
+</div>
+{{/modal}}

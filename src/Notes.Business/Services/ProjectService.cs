@@ -19,7 +19,7 @@ public class ProjectService : IProjectService
     }
 
     ///<inheritdoc />
-    public bool TryIndex(NotesDbContext db, out ProjectIndexModel? indexModel)
+    public bool TryIndex(in NotesDbContext db, out ProjectIndexModel? indexModel)
     {
         var projects = db.Projects
             .Where(p => p.UserId == HttpContext.UserId)
@@ -35,7 +35,7 @@ public class ProjectService : IProjectService
     }
 
     ///<inheritdoc />
-    public bool TryGet(NotesDbContext db, string projectName, out ProjectReadModel? readModel)
+    public bool TryGet(in NotesDbContext db, string projectName, out ProjectReadModel? readModel)
     {
         readModel = db.Projects
             .Where(p => 
@@ -49,7 +49,7 @@ public class ProjectService : IProjectService
     }
 
     ///<inheritdoc />
-    public bool TryPut(NotesDbContext db, string projectName, ProjectWriteModel writeModel, out ProjectReadModel? readModel)
+    public bool TryPut(in NotesDbContext db, string projectName, in ProjectWriteModel writeModel, out ProjectReadModel? readModel)
     {
         var project = db.Projects.SingleOrDefault(p => 
             p.Name == projectName &&
@@ -72,7 +72,7 @@ public class ProjectService : IProjectService
     }
 
     ///<inheritdoc />
-    public bool TryDelete(NotesDbContext db, string projectName)
+    public bool TryDelete(in NotesDbContext db, string projectName)
     {
         var project = db.Projects.SingleOrDefault(p => 
             p.Name == projectName &&

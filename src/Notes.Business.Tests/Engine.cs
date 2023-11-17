@@ -21,7 +21,9 @@ public static class Engine
                 Guid.NewGuid().ToString(), 
                 options => options.EnableNullChecks()
         );
-        services.AddSingleton(new NotesDbContext(dbOptionsBuilder.Options));
+
+        services.AddSingleton(dbOptionsBuilder.Options);
+        services.AddSingleton<NotesDbContext>();
 
         services.AddSingleton<NoteService>();
         services.AddSingleton<ProjectService>();

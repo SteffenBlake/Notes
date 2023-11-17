@@ -13,7 +13,7 @@ public class EditHistoryService : IEditHistoryService
         HttpContext = httpContext;
     }
 
-    public IQueryable<EditHistory> GetHistory(NotesDbContext db, int skip = 0, int take = 5)
+    public IQueryable<EditHistory> GetHistory(in NotesDbContext db, int skip = 0, int take = 5)
     {
         return db.EditHistory
             .Include(h => h.Note)
@@ -24,7 +24,7 @@ public class EditHistoryService : IEditHistoryService
             .Take(take);
     }
 
-    public void AddWebsiteEvent(NotesDbContext db)
+    public void AddWebsiteEvent(in NotesDbContext db)
     {
         db.EditHistory.Add(new()
         {
@@ -35,7 +35,7 @@ public class EditHistoryService : IEditHistoryService
         db.SaveChanges();
     }
 
-    public void AddProjectEvent(NotesDbContext db, string projectId)
+    public void AddProjectEvent(in NotesDbContext db, string projectId)
     {
         db.EditHistory.Add(new()
         {
@@ -47,7 +47,7 @@ public class EditHistoryService : IEditHistoryService
         db.SaveChanges();
     }
 
-    public void AddNoteEvent(NotesDbContext db, string noteId)
+    public void AddNoteEvent(in NotesDbContext db, string noteId)
     {
         db.EditHistory.Add(new()
         {
