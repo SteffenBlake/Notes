@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Notes.Business.Extensions;
 using Notes.Business.Models.Notes;
 using Notes.Business.Models.Projects;
 using Notes.Business.Services.Abstractions;
@@ -13,7 +14,7 @@ namespace Notes.Website.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ProjectsController : ControllerBase
+public class ProjectsController : NotesControllerBase
 {
     private NotesDbContext DB { get; }
     private IProjectService ProjectService { get; }
@@ -35,13 +36,18 @@ public class ProjectsController : ControllerBase
     [HttpGet("")]
     public async Task<IActionResult> IndexProjects()
     {
-        if (!await ProjectService.TryIndexAsync(DB, out var errorTask, out var indexModelTask))
+        if (!TryCheckModelState(out var modelResult))
         {
-            // TODO: Next add actual handling of errors
-            return NotFound();
+            return modelResult!;
         }
 
-        return Ok(await indexModelTask);
+        await using var txn = await DB.Database.BeginTransactionAsync();
+
+        var result = await ProjectService.TryIndexAsync(DB);
+
+        await txn.HandleTryResultAsync(result);
+
+        return TryResultResponse(result);
     }
 
     /// <summary>

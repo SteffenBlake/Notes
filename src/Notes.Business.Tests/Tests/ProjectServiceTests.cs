@@ -51,15 +51,13 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
     [Test]
     public async Task Index_Works()
     {
-        var result = await PrimaryService!.TryIndexAsync(Db!, out var errorsTask, out var indexModelTask);
-        var errors = await errorsTask;
-        var indexModel = await indexModelTask;
+        var result = await PrimaryService!.TryIndexAsync(Db!);
 
-        Assert.That(result, Is.True);
-        Assert.That(indexModel, Is.Not.Null);
-        Assert.That(indexModel!.Data, Has.Count.EqualTo(2));
-        Assert.That(indexModel.Data, Has.One.Matches<ProjectReadModel>(m => m.Name == nameof(Project_NoNotes)));
-        Assert.That(indexModel.Data, Has.One.Matches<ProjectReadModel>(m => m.Name == nameof(Project_WithNotes)));
+        Assert.That(result.StatusCode, Is.EqualTo(200));
+        Assert.That(result.Data, Is.Not.Null);
+        Assert.That(result.Data!.Data, Has.Count.EqualTo(2));
+        Assert.That(result.Data.Data, Has.One.Matches<ProjectReadModel>(m => m.Name == nameof(Project_NoNotes)));
+        Assert.That(result.Data.Data, Has.One.Matches<ProjectReadModel>(m => m.Name == nameof(Project_WithNotes)));
     }
 
     [Test]
