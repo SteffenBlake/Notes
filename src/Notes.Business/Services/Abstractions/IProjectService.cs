@@ -8,7 +8,7 @@ public interface IProjectService
     /// <summary>
     /// Fetches the list of all Projects for a User
     /// </summary>
-    bool TryIndex(in NotesDbContext db, out ProjectIndexModel? indexModel);
+    Task<bool> TryIndexAsync(NotesDbContext db, out Task<ResultErrors> errorsTask, out Task<ProjectIndexModel?> indexModelTask);
 
     /// <summary>
     /// Reads out the data for a specific Project by name

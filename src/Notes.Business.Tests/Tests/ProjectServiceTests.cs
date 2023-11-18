@@ -49,9 +49,11 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
     }
 
     [Test]
-    public void Index_Works()
+    public async Task Index_Works()
     {
-        var result = PrimaryService!.TryIndex(Db!, out var indexModel);
+        var result = await PrimaryService!.TryIndexAsync(Db!, out var errorsTask, out var indexModelTask);
+        var errors = await errorsTask;
+        var indexModel = await indexModelTask;
 
         Assert.That(result, Is.True);
         Assert.That(indexModel, Is.Not.Null);

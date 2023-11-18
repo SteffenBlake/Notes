@@ -1,4 +1,6 @@
-﻿using Notes.Business.Models.Projects;
+﻿using Microsoft.EntityFrameworkCore;
+using Notes.Business.Extensions;
+using Notes.Business.Models.Projects;
 using Notes.Business.Services.Abstractions;
 using Notes.Data;
 using Notes.Data.Models;
@@ -18,20 +20,27 @@ public class ProjectService : IProjectService
         EditHistory = editHistory;
     }
 
-    ///<inheritdoc />
-    public bool TryIndex(in NotesDbContext db, out ProjectIndexModel? indexModel)
+    public Task<bool> TryIndexAsync(
+        NotesDbContext db, 
+        out Task<ResultErrors> errorsTask, 
+        out Task<ProjectIndexModel?> indexModelTask)
     {
-        var projects = db.Projects
+        (var successTask, errorsTask, indexModelTask) = TryIndexAsyncInternal(db);
+        return successTask;
+    }
+
+    private async Task<TryResult<ProjectIndexModel>> TryIndexAsyncInternal(NotesDbContext db)
+    {
+        var projects = await db.Projects
             .Where(p => p.UserId == HttpContext.UserId)
             .Select(ProjectReadModel.ToModel(db))
-            .ToList();
+            .ToListAsync();
 
-        indexModel = new ProjectIndexModel
+        var model = new ProjectIndexModel
         {
             Data = projects
         };
-
-        return true;
+        return TryResult<ProjectIndexModel>.Succeed(model);
     }
 
     ///<inheritdoc />

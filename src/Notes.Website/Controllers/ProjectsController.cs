@@ -33,14 +33,15 @@ public class ProjectsController : ControllerBase
     /// Fetches the list of all Projects for a User
     /// </summary>
     [HttpGet("")]
-    public IActionResult IndexProjects()
+    public async Task<IActionResult> IndexProjects()
     {
-        if (!ProjectService.TryIndex(DB, out var indexModel) || indexModel == null)
+        if (!await ProjectService.TryIndexAsync(DB, out var errorTask, out var indexModelTask))
         {
+            // TODO: Next add actual handling of errors
             return NotFound();
         }
 
-        return Ok(indexModel);
+        return Ok(await indexModelTask);
     }
 
     /// <summary>
