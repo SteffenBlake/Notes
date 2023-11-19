@@ -88,24 +88,23 @@ public class DirectoryServiceTests : TestBase<DirectoryService, MockHttpContextS
     }
 
     [Test]
-    public void TryGetOverview_InvalidDirectoryId_Fails()
+    public async Task TryGetOverview_InvalidDirectoryId_Fails()
     {
-        var result = PrimaryService!.TryGetOverview(Db!, "DoesntExist", out var readModel);
+        var (result, _, _, data) = await PrimaryService!.TryGetOverviewAsync(Db!, "DoesntExist");
 
         Assert.That(result, Is.False);
 
-        Assert.That(readModel.Projects, Is.Empty);
-        Assert.That(readModel.Primaries, Is.Empty);
-        Assert.That(readModel.Notes, Is.Empty);
+        Assert.That(data, Is.Null);
     }
 
     [Test]
-    public void TryGetOverview_Home_ReturnsOnlyHomeAndProjects()
+    public async Task TryGetOverview_Home_ReturnsOnlyHomeAndProjects()
     {
-        var result = PrimaryService!.TryGetOverview(Db!, "0", out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetOverviewAsync(Db!, "0");
 
         Assert.That(result, Is.True);
 
+        Assert.That(readModel, Is.Not.Null);
         Assert.That(readModel.Primaries.Keys, Has.Count.EqualTo(0));
         Assert.That(readModel.Notes, Has.Count.EqualTo(0));
 
@@ -117,12 +116,13 @@ public class DirectoryServiceTests : TestBase<DirectoryService, MockHttpContextS
 
 
     [Test]
-    public void TryGetOverview_ProjectNoNotes_ReturnsProjectsAndIsPrime()
+    public async Task TryGetOverview_ProjectNoNotes_ReturnsProjectsAndIsPrime()
     {
-        var result = PrimaryService!.TryGetOverview(Db!, Project_HasNoNotes, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetOverviewAsync(Db!, Project_HasNoNotes);
 
         Assert.That(result, Is.True);
 
+        Assert.That(readModel, Is.Not.Null);
         Assert.That(readModel.Notes, Has.Count.EqualTo(0));
 
         Assert.That(readModel.Primaries.Keys, Has.Count.EqualTo(1));
@@ -139,12 +139,13 @@ public class DirectoryServiceTests : TestBase<DirectoryService, MockHttpContextS
     }
 
     [Test]
-    public void TryGetOverview_PrimaryParent_ReturnsPrimePathAndProjectAndChild()
+    public async Task TryGetOverview_PrimaryParent_ReturnsPrimePathAndProjectAndChild()
     {
-        var result = PrimaryService!.TryGetOverview(Db!, Note_PrimaryParent, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetOverviewAsync(Db!, Note_PrimaryParent);
 
         Assert.That(result, Is.True);
 
+        Assert.That(readModel, Is.Not.Null);
         Assert.That(readModel.Primaries.Keys, Has.Count.EqualTo(2));
 
         Assert.That(readModel.Primaries.ContainsKey(Project_HasSomeNotes), Is.True);
@@ -177,12 +178,13 @@ public class DirectoryServiceTests : TestBase<DirectoryService, MockHttpContextS
     }
 
     [Test]
-    public void TryGetOverview_Primarychild_ReturnsPrimePathAndProjectAndParent()
+    public async Task TryGetOverview_Primarychild_ReturnsPrimePathAndProjectAndParent()
     {
-        var result = PrimaryService!.TryGetOverview(Db!, Note_PrimaryChild, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetOverviewAsync(Db!, Note_PrimaryChild);
 
         Assert.That(result, Is.True);
 
+        Assert.That(readModel, Is.Not.Null);
         Assert.That(readModel.Primaries.Keys, Has.Count.EqualTo(3));
 
         Assert.That(readModel.Primaries.ContainsKey(Project_HasSomeNotes), Is.True);
@@ -218,29 +220,32 @@ public class DirectoryServiceTests : TestBase<DirectoryService, MockHttpContextS
     }
 
     [Test]
-    public void TryGetDescendants_InvalidDir_Fails()
+    public async Task TryGetDescendants_InvalidDir_Fails()
     {
-        var result = PrimaryService!.TryGetDescendants(Db!, "DoesntExist", out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetDescendantsAsync(Db!, "DoesntExist");
 
         Assert.That(result, Is.False);
-        Assert.That(readModel.Descendants, Is.Empty);
+
+        Assert.That(readModel, Is.Null);
     }
 
     [Test]
-    public void TryGetDescendants_EmptyProj_Fails()
+    public async Task TryGetDescendants_EmptyProj_Fails()
     {
-        var result = PrimaryService!.TryGetDescendants(Db!, Project_HasNoNotes, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetDescendantsAsync(Db!, Project_HasNoNotes);
 
         Assert.That(result, Is.False);
-        Assert.That(readModel.Descendants, Is.Empty);
+        Assert.That(readModel, Is.Null);
     }
 
     [Test]
-    public void TryGetDescendants_LoadedProj_ReturnsNotes()
+    public async Task TryGetDescendants_LoadedProj_ReturnsNotes()
     {
-        var result = PrimaryService!.TryGetDescendants(Db!, Project_HasSomeNotes, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetDescendantsAsync(Db!, Project_HasSomeNotes);
 
         Assert.That(result, Is.True);
+
+        Assert.That(readModel, Is.Not.Null);
         Assert.That(readModel.Descendants, Has.Count.EqualTo(3));
         Assert.That(readModel.Descendants, Has.One.Items.Matches<DirectoryReadModel>(m =>
             m.Name == Note_HasNoChildren
@@ -254,18 +259,18 @@ public class DirectoryServiceTests : TestBase<DirectoryService, MockHttpContextS
     }
 
     [Test]
-    public void TryGetDescendants_EmptyNote_ReturnsEmpty()
+    public async Task TryGetDescendants_EmptyNote_ReturnsEmpty()
     {
-        var result = PrimaryService!.TryGetDescendants(Db!, Note_HasNoChildren, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetDescendantsAsync(Db!, Note_HasNoChildren);
 
         Assert.That(result, Is.False);
-        Assert.That(readModel.Descendants, Is.Empty);
+        Assert.That(readModel, Is.Null);
     }
 
     [Test]
-    public void TryGetDescendants_LoadedNote_ReturnsNotes()
+    public async Task TryGetDescendants_LoadedNote_ReturnsNotes()
     {
-        var result = PrimaryService!.TryGetDescendants(Db!, Note_HasChildren, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetDescendantsAsync(Db!, Note_HasChildren);
 
         Assert.That(result, Is.True);
         Assert.That(readModel.Descendants, Has.Count.EqualTo(1));

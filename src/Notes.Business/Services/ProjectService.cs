@@ -34,61 +34,64 @@ public class ProjectService : IProjectService
     }
 
     ///<inheritdoc />
-    public bool TryGet(in NotesDbContext db, string projectName, out ProjectReadModel? readModel)
+    public async Task<TryResult<ProjectReadModel>> TryGetAsync(NotesDbContext db, string projectName)
     {
-        readModel = db.Projects
+        var readModel = await db.Projects
             .Where(p => 
                 p.Name == projectName &&
                 p.UserId == HttpContext.UserId
             )
             .Select(ProjectReadModel.ToModel(db))
-            .SingleOrDefault();
+            .SingleOrDefaultAsync();
 
-        return readModel != null;
+        return readModel == null ?
+            TryResult<ProjectReadModel>.NotFound() :
+            TryResult<ProjectReadModel>.Succeed(readModel);
     }
 
     ///<inheritdoc />
-    public bool TryPut(in NotesDbContext db, string projectName, in ProjectWriteModel writeModel, out ProjectReadModel? readModel)
+    public async Task<TryResult<ProjectReadModel>> TryPutAsync(NotesDbContext db, string projectName, ProjectWriteModel writeModel)
     {
-        var project = db.Projects.SingleOrDefault(p => 
+        var project = await db.Projects.SingleOrDefaultAsync(p => 
             p.Name == projectName &&
             p.UserId == HttpContext.UserId
         );
-        project ??= db.Projects.Add(
+
+        project ??= (await db.Projects.AddAsync(
             new Project
             {
                 Name = projectName,
                 UserId = HttpContext.UserId!
-            }).Entity;
+            })).Entity;
 
-        writeModel.Write(db, HttpContext.UserId, project);
+        await writeModel.WriteAsync(db, HttpContext.UserId, project);
 
-        db.SaveChanges();
+        await db.SaveChangesAsync();
 
-        EditHistory.AddProjectEvent(db, project.ProjectId);
+        await EditHistory.AddProjectEventAsync(db, project.ProjectId);
 
-        return TryGet(db, projectName, out readModel);
+        return await TryGetAsync(db, projectName);
     }
 
     ///<inheritdoc />
-    public bool TryDelete(in NotesDbContext db, string projectName)
+    public async Task<TryResult<object>> TryDeleteAsync(NotesDbContext db, string projectName)
     {
+        if (await db.Notes.AnyAsync(n => n.Project.Name == projectName))
+        {
+            return TryResult<object>.Conflict(nameof(projectName), "Cannot delete a project with associated notes");
+        }
+
         var project = db.Projects.SingleOrDefault(p => 
             p.Name == projectName &&
             p.UserId == HttpContext.UserId
         );
         if (project == null)
         {
-            return false;
-        }
-
-        if (db.Notes.Any(n => n.ProjectId == project.ProjectId))
-        {
-            throw new InvalidOperationException("Cannot delete a project with associated notes");
+            return TryResult<object>.Gone();
         }
 
         db.Remove(project);
-        db.SaveChanges();
-        return true;
+        await db.SaveChangesAsync();
+        return TryResult<object>.Succeed(new { });
     }
 }

@@ -5,17 +5,29 @@ using Notes.Data.Models;
 namespace Notes.Business.Tests.Mocks;
 public class MockEditHistoryService : IEditHistoryService
 {
-    public IQueryable<EditHistory> GetHistory(in NotesDbContext db, int skip = 0, int take = 5)
+    public IQueryable<EditHistory> GetHistory(NotesDbContext db, int skip = 0, int take = 5)
     {
         throw new NotImplementedException();
     }
 
     public int WebsiteEvents { get; private set; }
-    public void AddWebsiteEvent(in NotesDbContext db) => WebsiteEvents++;
+    public Task AddWebsiteEventAsync(NotesDbContext db)
+    {
+        WebsiteEvents++;
+        return Task.CompletedTask;
+    }
 
     public int ProjectEvents { get; private set; }
-    public void AddProjectEvent(in NotesDbContext db, string projectId) => ProjectEvents++;
+    public Task AddProjectEventAsync(NotesDbContext db, string projectId)
+    {
+        ProjectEvents++;
+        return Task.CompletedTask;
+    }
 
     public int NoteEvents { get; private set; }
-    public void AddNoteEvent(in NotesDbContext db, string noteId) => NoteEvents++;
+    public Task AddNoteEventAsync(NotesDbContext db, string noteId)
+    {
+        NoteEvents++;
+        return Task.CompletedTask;
+    }
 }

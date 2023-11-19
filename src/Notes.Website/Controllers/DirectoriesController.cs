@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Notes.Business.Extensions;
 using Notes.Business.Services.Abstractions;
 using Notes.Data;
 
@@ -17,32 +18,17 @@ namespace Notes.Website.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class DirectoriesController : ControllerBase
+public class DirectoriesController(NotesDbContext db, IDirectoryService DirectoryService) 
+    : NotesControllerBase(db)
 {
-    private NotesDbContext DB { get; }
-
-    private IDirectoryService DirectoryService { get; }
-
-    /// <inheritdoc />
-    public DirectoriesController(NotesDbContext db, IDirectoryService directoryService)
-    {
-        DB = db;
-        DirectoryService = directoryService;
-    }
-
     /// <summary>
     /// Fetches the list of items that the user has modified in their history
     /// in order of most recent to least
     /// </summary>
     [HttpGet("recent")]
-    public IActionResult Recent([FromQuery]int skip = 0, [FromQuery]int take = 5)
+    public async Task<IActionResult> Recent([FromQuery]int skip = 0, [FromQuery]int take = 5)
     {
-        if (!DirectoryService.TryGetRecent(DB, out var readModel, skip, take))
-        {
-            return NotFound();
-        }
-
-        return Ok(readModel);
+        return await HandleTryResultAsync((db) => DirectoryService.TryGetRecentAsync(db, skip, take));
     }
 
     /// <summary>
@@ -52,15 +38,9 @@ public class DirectoriesController : ControllerBase
     /// and all directories from Home drilling directly down to <see cref="directoryId"/> depth first
     /// </summary>
     [HttpGet("{directoryId}/overview")]
-    public IActionResult Overview(string directoryId)
+    public async Task<IActionResult> Overview(string directoryId)
     {
-        if (!DirectoryService.TryGetOverview(DB, directoryId, out var readModel))
-        {
-            return NotFound();
-        }
-
-        return Ok(readModel);
-
+        return await HandleTryResultAsync((db) => DirectoryService.TryGetOverviewAsync(db, directoryId));
     }
 
     /// <summary>
@@ -68,13 +48,8 @@ public class DirectoriesController : ControllerBase
     /// for a specific directory id, whether it is a project or a note
     /// </summary>
     [HttpGet("{directoryId}/descendants")]
-    public IActionResult Descendants(string directoryId)
+    public async Task<IActionResult> Descendants(string directoryId)
     {
-        if (!DirectoryService.TryGetDescendants(DB, directoryId, out var readModel))
-        {
-            return NotFound();
-        }
-
-        return Ok(readModel);
+        return await HandleTryResultAsync((db) => DirectoryService.TryGetDescendantsAsync(db, directoryId));
     }
 }

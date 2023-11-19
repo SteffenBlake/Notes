@@ -51,20 +51,20 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
     [Test]
     public async Task Index_Works()
     {
-        var result = await PrimaryService!.TryIndexAsync(Db!);
+        var (result, _, statusCode, data) = await PrimaryService!.TryIndexAsync(Db!);
 
-        Assert.That(result.StatusCode, Is.EqualTo(200));
-        Assert.That(result.Data, Is.Not.Null);
-        Assert.That(result.Data!.Data, Has.Count.EqualTo(2));
-        Assert.That(result.Data.Data, Has.One.Matches<ProjectReadModel>(m => m.Name == nameof(Project_NoNotes)));
-        Assert.That(result.Data.Data, Has.One.Matches<ProjectReadModel>(m => m.Name == nameof(Project_WithNotes)));
+        Assert.That(statusCode, Is.EqualTo(200));
+        Assert.That(data, Is.Not.Null);
+        Assert.That(data!.Data, Has.Count.EqualTo(2));
+        Assert.That(data.Data, Has.One.Matches<ProjectReadModel>(m => m.Name == nameof(Project_NoNotes)));
+        Assert.That(data.Data, Has.One.Matches<ProjectReadModel>(m => m.Name == nameof(Project_WithNotes)));
     }
 
     [Test]
-    public void Put_NewProject_GetsAdded()
+    public async Task Put_NewProject_GetsAdded()
     {
         var writeModel = new ProjectWriteModel();
-        var result = PrimaryService!.TryPut(Db!, nameof(Put_NewProject_GetsAdded), writeModel, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryPutAsync(Db!, nameof(Put_NewProject_GetsAdded), writeModel);
         var added = Db!.Projects.SingleOrDefault(p => p.Name == nameof(Put_NewProject_GetsAdded));
 
         Assert.That(result, Is.True);
@@ -77,10 +77,10 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
     }
 
     [Test]
-    public void Put_ExistingProject_GetsUpdated()
+    public async Task Put_ExistingProject_GetsUpdated()
     {
         var writeModel = new ProjectWriteModel();
-        var result = PrimaryService!.TryPut(Db!, nameof(Project_WithNotes), writeModel, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryPutAsync(Db!, nameof(Project_WithNotes), writeModel);
         var added = Db!.Projects.SingleOrDefault(p => p.Name == nameof(Project_WithNotes));
 
         Assert.That(result, Is.True);
@@ -91,18 +91,18 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
     }
 
     [Test]
-    public void Get_UnownedProject_Fails()
+    public async Task Get_UnownedProject_Fails()
     {
-        var result = PrimaryService!.TryGet(Db!, nameof(Project_NotOwned), out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetAsync(Db!, nameof(Project_NotOwned));
 
         Assert.That(result, Is.False);
         Assert.That(readModel, Is.Null);
     }
 
     [Test]
-    public void Get_NonExistingProject_Fails()
+    public async Task Get_NonExistingProject_Fails()
     {
-        var result = PrimaryService!.TryGet(Db!, "DoesntExist", out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetAsync(Db!, "DoesntExist");
 
         Assert.That(result, Is.False);
         Assert.That(readModel, Is.Null);
@@ -117,9 +117,9 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
 
     [Test]
     [TestCaseSource(nameof(Get_OwnedProject_CorrectData_Cases))]
-    public void Get_OwnedProject_CorrectData(string projectName, bool expectedCanDelete)
+    public async Task Get_OwnedProject_CorrectData(string projectName, bool expectedCanDelete)
     {
-        var result = PrimaryService!.TryGet(Db!, projectName, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetAsync(Db!, projectName);
 
         Assert.That(result, Is.True);
         Assert.That(readModel, Is.Not.Null);
@@ -130,9 +130,9 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
     }
 
     [Test]
-    public void Delete_UnownedProject_Fails()
+    public async Task Delete_UnownedProject_Fails()
     {
-        var result = PrimaryService!.TryDelete(Db!, nameof(Project_NotOwned));
+        var (result, _, _, _) = await PrimaryService!.TryDeleteAsync(Db!, nameof(Project_NotOwned));
         var existing = Db!.Projects.SingleOrDefault(p => p.ProjectId == nameof(Project_NotOwned));
 
         Assert.That(result, Is.False);
@@ -140,28 +140,27 @@ internal class ProjectServiceTests : TestBase<ProjectService, MockHttpContextSer
     }
 
     [Test]
-    public void Delete_NonExistingProject_Fails()
+    public async Task Delete_NonExistingProject_Fails()
     {
-        var result = PrimaryService!.TryDelete(Db!, "DoesntExist");
+        var (result, _, _, _) = await PrimaryService!.TryDeleteAsync(Db!, "DoesntExist");
         Assert.That(result, Is.False);
     }
 
     [Test]
-    public void Delete_HasNotes_Throws()
+    public async Task Delete_HasNotes_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
-        {
-            PrimaryService!.TryDelete(Db!, nameof(Project_WithNotes));
-        });
+        var (result, _, _, _) = await PrimaryService!.TryDeleteAsync(Db!, nameof(Project_WithNotes));
+
+        Assert.That(result, Is.False);
 
         var existing = Db!.Projects.SingleOrDefault(p => p.ProjectId == nameof(Project_WithNotes));
         Assert.That(existing, Is.Not.Null);
     }
 
     [Test]
-    public void Delete_EmptyProject_Succeeds()
+    public async Task Delete_EmptyProject_Succeeds()
     {
-        var result = PrimaryService!.TryDelete(Db!, nameof(Project_NoNotes));
+        var (result, _, _, _) = await PrimaryService!.TryDeleteAsync(Db!, nameof(Project_NoNotes));
         var existing = Db!.Projects.SingleOrDefault(p => p.ProjectId == nameof(Project_NoNotes));
 
         Assert.That(result, Is.True);

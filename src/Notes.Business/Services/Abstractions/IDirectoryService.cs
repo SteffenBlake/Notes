@@ -12,7 +12,7 @@ public interface IDirectoryService
     /// <summary>
     /// Fetches the list of items that the user has modified in their history, in order of most recent to least
     /// </summary>
-    bool TryGetRecent(in NotesDbContext db, out DirectoryRecentReadModel readModel, int skip = 0, int take = 5);
+    Task<TryResult<DirectoryRecentReadModel>> TryGetRecentAsync(NotesDbContext db, int skip = 0, int take = 5);
 
     /// <summary>
     /// Fetches the high level overview of directories relevant for a given specified directory.
@@ -20,11 +20,11 @@ public interface IDirectoryService
     /// the list of files 1 layer into the opened project (if directory id is or is in a project)
     /// and all directories from Home drilling directly down to <see cref="directoryId"/> depth first
     /// </summary>
-    bool TryGetOverview(in NotesDbContext db, string directoryId, out DirectoryOverviewReadModel readModel);
+    Task<TryResult<DirectoryOverviewReadModel>> TryGetOverviewAsync(NotesDbContext db, string directoryId);
 
     /// <summary>
     /// Gets all immediate descendants (1 layer of depth)
     /// for a specific directory id, whether it is a project or a note
     /// </summary>
-    bool TryGetDescendants(in NotesDbContext db, string directoryId, out DirectoryDescendantsReadModel readModel);
+    Task<TryResult<DirectoryDescendantsReadModel>> TryGetDescendantsAsync(NotesDbContext db, string directoryId);
 }

@@ -13,7 +13,7 @@ public class EditHistoryService : IEditHistoryService
         HttpContext = httpContext;
     }
 
-    public IQueryable<EditHistory> GetHistory(in NotesDbContext db, int skip = 0, int take = 5)
+    public IQueryable<EditHistory> GetHistory(NotesDbContext db, int skip = 0, int take = 5)
     {
         return db.EditHistory
             .Include(h => h.Note)
@@ -24,38 +24,38 @@ public class EditHistoryService : IEditHistoryService
             .Take(take);
     }
 
-    public void AddWebsiteEvent(in NotesDbContext db)
+    public async Task AddWebsiteEventAsync(NotesDbContext db)
     {
-        db.EditHistory.Add(new()
+        await db.EditHistory.AddAsync(new()
         {
             EdittedById = HttpContext.UserId!,
             Timestamp = DateTimeOffset.Now,
         });
 
-        db.SaveChanges();
+        await db.SaveChangesAsync();
     }
 
-    public void AddProjectEvent(in NotesDbContext db, string projectId)
+    public async Task AddProjectEventAsync(NotesDbContext db, string projectId)
     {
-        db.EditHistory.Add(new()
+        await db.EditHistory.AddAsync(new()
         {
             EdittedById = HttpContext.UserId!,
             Timestamp = DateTimeOffset.Now,
             ProjectId = projectId
         });
 
-        db.SaveChanges();
+        await db.SaveChangesAsync();
     }
 
-    public void AddNoteEvent(in NotesDbContext db, string noteId)
+    public async Task AddNoteEventAsync(NotesDbContext db, string noteId)
     {
-        db.EditHistory.Add(new()
+        await db.EditHistory.AddAsync(new()
         {
             EdittedById = HttpContext.UserId!,
             Timestamp = DateTimeOffset.Now,
             NoteId = noteId
         });
 
-        db.SaveChanges();
+        await db.SaveChangesAsync();
     }
 }

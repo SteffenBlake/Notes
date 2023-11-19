@@ -15,6 +15,5 @@ public class HttpContextService : IHttpContextService
 
     public string? UserId => HttpContextAccessor
         .HttpContext?.User
-        .FindFirst(ClaimTypes.NameIdentifier)?
-        .Value;
+        .FindFirstValue(ClaimTypes.NameIdentifier);
 }

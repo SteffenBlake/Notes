@@ -13,15 +13,15 @@ public interface IProjectService
     /// <summary>
     /// Reads out the data for a specific Project by name
     /// </summary>
-    bool TryGet(in NotesDbContext db, string projectName, out ProjectReadModel? readModel);
+    Task<TryResult<ProjectReadModel>> TryGetAsync(NotesDbContext db, string projectName);
 
     /// <summary>
     /// Adds or Updates a project to/in the system, by project name
     /// </summary>
-    bool TryPut(in NotesDbContext db, string projectName, in ProjectWriteModel writeModel, out ProjectReadModel? readModel);
+    Task<TryResult<ProjectReadModel>> TryPutAsync(NotesDbContext db, string projectName, ProjectWriteModel writeModel);
     
     /// <summary>
     /// Deletes a project. Throws an exception if the project has any notes associated with it.
     /// </summary>
-    bool TryDelete(in NotesDbContext db, string projectName);
+    Task<TryResult<object>> TryDeleteAsync(NotesDbContext db, string projectName);
 }

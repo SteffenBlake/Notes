@@ -1,0 +1,11 @@
+<input 
+    name="{{name}}" 
+    type="text" 
+    class="form-control" 
+    id="{{name}}-input"
+    placeholder="{{displayName}}" 
+    {{ternary required 'required' ''}}
+    aria-labelledby="{{name}}-input-lbl"
+    aria-required="{{required}}"
+>
+<label id="{{name}}-input-lbl" for="{{name}}-input">{{displayName}}</label>

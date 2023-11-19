@@ -1,12 +1,42 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Notes.Business.Extensions;
+using Notes.Data;
 
 namespace Notes.Website.Controllers;
 
 /// <summary>
 /// Standard base controller for all API controllers to inherit from
 /// </summary>
-public abstract class NotesControllerBase : ControllerBase
+public abstract class NotesControllerBase(NotesDbContext db) : ControllerBase
 {
+    /// <summary>
+    /// The Database
+    /// </summary>
+    protected NotesDbContext DB { get; } = db;
+
+    /// <summary>
+    /// Wrapper method for processing common TryResult Methods
+    /// </summary>
+    [NonAction]
+    protected async Task<IActionResult> HandleTryResultAsync<T>(
+        Func<NotesDbContext, Task<TryResult<T>>> method
+    )
+        where T: class
+    {
+        if (!TryCheckModelState(out var modelResult))
+        {
+            return modelResult!;
+        }
+
+        await using var txn = await DB.Database.BeginTransactionAsync();
+
+        var result = await method(DB);
+
+        await txn.HandleTryResultAsync(result);
+
+        return TryResultResponse(result);
+    }
+
     /// <summary>
     /// Parses ModelState and returns whether it has errors or not, 
     /// and produces an Error json result if it does

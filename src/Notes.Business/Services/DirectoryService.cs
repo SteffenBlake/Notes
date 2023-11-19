@@ -20,24 +20,24 @@ public class DirectoryService : IDirectoryService
     }
 
     ///<inheritdoc />
-    public bool TryGetRecent(in NotesDbContext db, out DirectoryRecentReadModel readModel, int skip = 0, int take = 5)
+    public async Task<TryResult<DirectoryRecentReadModel>> TryGetRecentAsync(NotesDbContext db, int skip = 0, int take = 5)
     {
-        var recent = EditHistory.GetHistory(db, skip, take)
+        var recent = await EditHistory.GetHistory(db, skip, take)
             .Select(DirectoryReadModel.Read(db))
-            .ToList();
+            .ToListAsync();
 
-        readModel = new()
+        var readModel = new DirectoryRecentReadModel()
         {
             Recent = recent
         };
 
-        return true;
+        return TryResult<DirectoryRecentReadModel>.Succeed(readModel);
     }
 
     ///<inheritdoc />
-    public bool TryGetOverview(in NotesDbContext db, string directoryId, out DirectoryOverviewReadModel readModel)
+    public async Task<TryResult<DirectoryOverviewReadModel>> TryGetOverviewAsync(NotesDbContext db, string directoryId)
     {
-        readModel = new();
+        var readModel = new DirectoryOverviewReadModel();
 
         var projectIds = db.EditHistory
             .Include(h => h.Note)
@@ -51,25 +51,27 @@ public class DirectoryService : IDirectoryService
             )
             .Select(h => h.Note!.ProjectId);
 
-        var all = db.EditHistory.Where(h =>
+        var allHistory = await db.EditHistory.Where(h =>
                 // Projects
                 h.ProjectId != null ||
                 // All notes inside that project (we will filter off the extras after)
                 h.NoteId == directoryId ||
                 (
-                    h.Note != null && 
+                    h.Note != null &&
                     projectIds.Contains(h.Note.ProjectId)
                 )
             )
             .Select(DirectoryReadModel.Read(db))
-            .ToList()
+            .ToListAsync();
+
+        var all = allHistory
             .GroupBy(h => h.Id)
             .Select(g => g.First())
             .ToDictionary(m => m.Id, m => m);
 
         if (directoryId != "0" && !all.ContainsKey(directoryId))
         {
-            return false;
+            return TryResult<DirectoryOverviewReadModel>.NotFound();
         }
 
         var directoryScan = directoryId;
@@ -94,13 +96,13 @@ public class DirectoryService : IDirectoryService
             }
         }
 
-        return true;
+        return TryResult<DirectoryOverviewReadModel>.Succeed(readModel);
     }
 
     ///<inheritdoc />
-    public bool TryGetDescendants(in NotesDbContext db, string directoryId, out DirectoryDescendantsReadModel readModel)
+    public async Task<TryResult<DirectoryDescendantsReadModel>> TryGetDescendantsAsync(NotesDbContext db, string directoryId)
     {
-        var descendants = db.EditHistory
+        var history = await db.EditHistory
             .Include(h => h.Note)
             .Include(h => h.Project)
             .Where(h =>
@@ -111,16 +113,23 @@ public class DirectoryService : IDirectoryService
                 )
             )
             .Select(DirectoryReadModel.Read(db))
-            .ToList()
+            .ToListAsync();
+
+        var descendants = history
             .GroupBy(h => h.Id)
             .Select(h => h.First())
             .ToList();
 
-        readModel = new()
+        if (!descendants.Any())
+        {
+            return TryResult<DirectoryDescendantsReadModel>.NotFound();
+        }
+
+        var readModel = new DirectoryDescendantsReadModel()
         {
             Descendants = descendants
         };
 
-        return readModel.Descendants.Any();
+        return TryResult<DirectoryDescendantsReadModel>.Succeed(readModel);
     }
 }

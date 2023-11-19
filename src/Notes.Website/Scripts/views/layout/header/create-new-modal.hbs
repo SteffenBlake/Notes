@@ -15,7 +15,20 @@
     <div class="tab-content w-100 pt-3 flex-grow-1">
         <div class="tab-pane h-100 active" id="create-project-pane" role="tabpanel"
             aria-labelledby="create-project-tab">
-            {{> projectForm }}
+            <form class="h-100 d-flex flex-column" method="POST" action="">
+                <div class="form-floating w-50 mb-3">
+                    {{> textInput name='name' displayName='Name' id='create-project-name' }}
+                </div>
+
+                {{> editProject }}
+
+                <hr class="mt-auto">
+
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary btn-lg">Cancel</button>
+                    <button type="button" class="btn btn-primary btn-lg ms-3">Create</button>
+                </div>
+            </form>
         </div>
 
         <div class="tab-pane w-75" id="create-note-pane" role="tabpanel" aria-labelledby="create-note-tab"

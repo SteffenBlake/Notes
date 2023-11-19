@@ -1,4 +1,5 @@
-﻿using Notes.Business.Models.Notes;
+﻿using Microsoft.EntityFrameworkCore;
+using Notes.Business.Models.Notes;
 using Notes.Business.Services.Abstractions;
 using Notes.Data;
 using Notes.Data.Models;
@@ -19,37 +20,60 @@ public class NoteService : INoteService
     }
 
     /// <inheritdoc />
-    public bool TryIndex(in NotesDbContext db, string projectName, out NoteIndexModel? indexModel)
+    public async Task<TryResult<NoteIndexModel>> TryIndexAsync(NotesDbContext db, string projectName)
     {
         if (string.IsNullOrEmpty(projectName))
         {
             throw new ArgumentNullException(nameof(projectName));
         }
 
-        var project = db.Projects.SingleOrDefault(p => 
+        var project = await db.Projects.SingleOrDefaultAsync(p => 
             p.Name == projectName &&
             p.UserId == HttpContext.UserId
         );
         if (project == null)
         {
-            indexModel = null;
-            return false;
+            return TryResult<NoteIndexModel>.NotFound();
         }
 
-        var data = db.Notes.Where(n => n.Project.Name == projectName)
+        var data = await db.Notes.Where(n => n.Project.Name == projectName)
             .Select(NoteReadModel.FromModel(db))
-            .ToList();
+            .ToListAsync();
 
-        indexModel = new NoteIndexModel
+        var indexModel = new NoteIndexModel
         {
             Data = data
         };
 
-        return true;
+        return TryResult<NoteIndexModel>.Succeed(indexModel);
     }
 
     /// <inheritdoc />
-    public bool TryPut(in NotesDbContext db, string projectName, string path, in NoteWriteModel writeModel, out NoteReadModel? readModel)
+    public async Task<TryResult<NoteReadModel>> TryGetAsync(NotesDbContext db, string projectName, string path)
+    {
+        if (string.IsNullOrEmpty(projectName))
+        {
+            throw new ArgumentNullException(nameof(projectName));
+        }
+        if (string.IsNullOrEmpty(path))
+        {
+            throw new ArgumentNullException(nameof(path));
+        }
+
+        var (success, heirarchy, segments) = await TryGetInternalAsync(db, projectName, path);
+
+        Note ? note;
+        if (!success || (note = heirarchy[^1]) == null)
+        {
+            return TryResult<NoteReadModel>.NotFound();
+        }
+
+        var readModel = NoteReadModel.FromModel(db).Compile()(note);
+        return TryResult<NoteReadModel>.Succeed(readModel);
+    }
+
+    /// <inheritdoc />
+    public async Task<TryResult<NoteReadModel>> TryPutAsync(NotesDbContext db, string projectName, string path, NoteWriteModel writeModel)
     {
         if (string.IsNullOrEmpty(projectName))
         {
@@ -62,22 +86,21 @@ public class NoteService : INoteService
 
         var user = db.Users.Find(HttpContext.UserId)!;
 
-        var projectId = db.Projects.Where(p => 
+        var projectId = await db.Projects.Where(p => 
                 p.Name == projectName &&
                 p.UserId == HttpContext.UserId
             )
             .Select(p => p.ProjectId)
-            .SingleOrDefault();
+            .SingleOrDefaultAsync();
+
         if (string.IsNullOrEmpty(projectId))
         {
-            readModel = null;
-            return false;
+            return TryResult<NoteReadModel>.NotFound();
         }
 
-        if (
-            !TryGetInternal(db, projectName, path, out var heirarchy, out var segments) ||
-            heirarchy.LastOrDefault() == null
-        )
+        var (success, heirarchy, segments) = await TryGetInternalAsync(db, projectName, path);
+
+        if (!success || heirarchy.LastOrDefault() == null)
         {
             for (var i = 0; i < heirarchy.Length; i++)
             {
@@ -101,40 +124,13 @@ public class NoteService : INoteService
 
         db.SaveChanges();
 
-        EditHistory.AddNoteEvent(db, heirarchy[0]!.NoteId);
+        await EditHistory.AddNoteEventAsync(db, heirarchy[0]!.NoteId);
 
-        return TryGet(db, projectName, path, out readModel);
-    }
-
-    /// <inheritdoc />
-    public bool TryGet(in NotesDbContext db, string projectName, string path, out NoteReadModel? readModel)
-    {
-        if (string.IsNullOrEmpty(projectName))
-        {
-            throw new ArgumentNullException(nameof(projectName));
-        }
-        if (string.IsNullOrEmpty(path))
-        {
-            throw new ArgumentNullException(nameof(path));
-        }
-
-        Note? note;
-        if (
-            !TryGetInternal(db, projectName, path, out var heirarchy, out _) ||
-            (note = heirarchy.LastOrDefault()) == null
-        )
-        {
-            readModel = null;
-            return false;
-        }
-
-        readModel = NoteReadModel.FromModel(db).Compile()(note);
-
-        return true;
+        return await TryGetAsync(db, projectName, path);
     }
     
     /// <inheritdoc />
-    public bool TryDelete(in NotesDbContext db, string projectName, string path)
+    public async Task<TryResult<object>> TryDeleteAsync(NotesDbContext db, string projectName, string path)
     {
         if (string.IsNullOrEmpty(projectName))
         {
@@ -146,12 +142,10 @@ public class NoteService : INoteService
         }
 
         Note? note;
-        if (
-            !TryGetInternal(db, projectName, path, out var heirarchy, out _) ||
-            (note = heirarchy.LastOrDefault()) == null
-        )
+        var (success, heirarchy, _) = await TryGetInternalAsync(db, projectName, path);
+        if (!success || (note = heirarchy[^1]) == null)
         {
-            return false;
+            return TryResult<object>.Gone();
         }
 
         if (db.Notes.Any(n => n.ParentNoteId == note.NoteId))
@@ -165,10 +159,11 @@ public class NoteService : INoteService
         }
 
         db.SaveChanges();
-        return true;
+        return TryResult<object>.Succeed(new { });
     }
 
-    private bool TryGetInternal(in NotesDbContext db, string projectName, string path, out Note?[] heirarchy, out string[] segments)
+    private readonly record struct TryGetResult(bool success, Note?[] heirarchy, string[] segments);
+    private async Task<TryGetResult> TryGetInternalAsync(NotesDbContext db, string projectName, string path)
     {
         // this seems to be the cleanest way to achieve our desired result
         // of splitting up a uri path into segments
@@ -178,21 +173,26 @@ public class NoteService : INoteService
             .Where(s => !string.IsNullOrEmpty(s))
             .ToList();
 
-        segments = segmentsInternal.ToArray();
+        var segments = segmentsInternal.ToArray();
 
-        heirarchy = new Note[segmentsInternal.Count];
+        var heirarchy = new Note[segmentsInternal.Count];
 
-        var baseQuery = db.Notes.Where(n =>
+        var baseQuery = await db.Notes.Where(n =>
             n.Project.Name == projectName &&
             n.Project.UserId == HttpContext.UserId &&
             segmentsInternal.Contains(n.Name)
-        ).ToDictionary(n => n.NoteId, n => n);
+        ).ToDictionaryAsync(n => n.NoteId, n => n);
+
+        if (!baseQuery.Any())
+        {
+            return new(false, heirarchy, segments);
+        }
 
         // Get the matching root note
-        var note = baseQuery.SingleOrDefault(n => n.Value.ParentNoteId == null && n.Value.Name == segmentsInternal[0]).Value;
+        var note = baseQuery.Single(n => n.Value.ParentNoteId == null && n.Value.Name == segmentsInternal[0]).Value;
         if (note == null)
         {
-            return false;
+            return new (false, heirarchy, segments);
         }
 
         heirarchy[0] = note;
@@ -203,12 +203,12 @@ public class NoteService : INoteService
             note = baseQuery.SingleOrDefault(n => n.Value.ParentNoteId == noteId && n.Value.Name == segmentsInternal[i]).Value;
             if (note == null)
             {
-                return false;
+                return new (false, heirarchy, segments);
             }
 
             heirarchy[i] = note;
         }
 
-        return true;
+        return new (true, heirarchy, segments);
     }
 }

@@ -1,5 +1,4 @@
-﻿
-public readonly struct TryResult<T> 
+﻿public readonly struct TryResult<T> 
     where T : class
 {
     public TryResult(T data)
@@ -30,6 +29,14 @@ public readonly struct TryResult<T>
     public ResultErrors Errors { get; } = new();
     public int StatusCode { get; } = 200;
 
+    public void Deconstruct(out bool success, out ResultErrors errors, out int statusCode, out T? data)
+    {
+        success = !Errors.Any() && StatusCode == 200;
+        errors = Errors;
+        statusCode = StatusCode;
+        data = Data;
+    }
+
     public static TryResult<T> Succeed(T data) => new (data);
 
     public static TryResult<T> BadRequest(string field, string message) => new(400, field, message);
@@ -45,6 +52,10 @@ public readonly struct TryResult<T>
 /// <inheritdoc/>
 public class ResultErrors : Dictionary<string, HashSet<string>>
 {
+    public ResultErrors() : base() 
+    { 
+    }
+
     public ResultErrors(IDictionary<string, HashSet<string>> dictionary) : base(dictionary)
     {
     }

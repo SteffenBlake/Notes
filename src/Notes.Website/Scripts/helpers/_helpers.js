@@ -1,7 +1,9 @@
-import uuid from './uuid.js';
 import readFile from './read-file.js';
+import ternary from './ternary.js';
+import uuid from './uuid.js';
 
 export default {
-    uuid,
-    readFile
+    readFile,
+    ternary,
+    uuid
 };

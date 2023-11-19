@@ -5,11 +5,11 @@ namespace Notes.Business.Services.Abstractions;
 
 public interface IEditHistoryService
 {
-    IQueryable<EditHistory> GetHistory(in NotesDbContext db, int skip = 0, int take = 5);
+    IQueryable<EditHistory> GetHistory(NotesDbContext db, int skip = 0, int take = 5);
 
-    void AddWebsiteEvent(in NotesDbContext db);
+    Task AddWebsiteEventAsync(NotesDbContext db);
 
-    void AddProjectEvent(in NotesDbContext db, string projectId);
+    Task AddProjectEventAsync(NotesDbContext db, string projectId);
 
-    void AddNoteEvent(in NotesDbContext db, string noteId);
+    Task AddNoteEventAsync(NotesDbContext db, string noteId);
 }

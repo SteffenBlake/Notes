@@ -1,6 +1,5 @@
 ﻿using Notes.Data;
 using Notes.Data.Models;
-using Notes.Data.Models.Identity;
 
 namespace Notes.Business.Models.Projects;
 public class ProjectWriteModel
@@ -9,9 +8,11 @@ public class ProjectWriteModel
 
     public string Icon { get; set; } = "journal";
 
-    public void Write(NotesDbContext db, string? userId, Project project)
+    public Task WriteAsync(NotesDbContext db, string? userId, Project project)
     {
         project.Description = Description;
         project.Icon = Icon;
+
+        return Task.CompletedTask;
     }
 }

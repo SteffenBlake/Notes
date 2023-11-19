@@ -67,27 +67,27 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
 
 
     [Test]
-    public void Index_EmptyProject_Throws()
+    public async Task Index_EmptyProject_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
         {
-            PrimaryService!.TryIndex(Db!, "", out _);
+            await PrimaryService!.TryIndexAsync(Db!, "");
         });
     }
 
     [TestCase("DoesntExist")]
-    public void Index_InvalidProject_ReturnsFail(string projectName)
+    public async Task Index_InvalidProject_ReturnsFail(string projectName)
     {
-        var result = PrimaryService!.TryIndex(Db!, projectName, out var indexModel);
+        var (result, _, _, indexModel) = await PrimaryService!.TryIndexAsync(Db!, projectName);
 
         Assert.That(result, Is.False);
         Assert.That(indexModel, Is.Null);
     }
 
     [TestCase(ProjectName)]
-    public void Index_ValidProject_ReturnsSuccess(string projectName)
+    public async Task Index_ValidProject_ReturnsSuccess(string projectName)
     {
-        var result = PrimaryService!.TryIndex(Db!, projectName, out var indexModel);
+        var (result, _, _, indexModel) = await PrimaryService!.TryIndexAsync(Db!, projectName);
 
         Assert.That(result, Is.True);
         Assert.That(indexModel, Is.Not.Null);
@@ -97,7 +97,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
     [TestCase("", "")]
     [TestCase("name", "")]
     [TestCase("", "name")]
-    public void Put_EmptyStrings_Throws(string projectName, string path)
+    public async Task Put_EmptyStrings_Throws(string projectName, string path)
     {
         var writeModel = new NoteWriteModel
         {
@@ -105,14 +105,14 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
             ContentRaw = "foo/foo"
         };
 
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
         {
-            PrimaryService!.TryPut(Db!, projectName, path, writeModel, out _);
+            await PrimaryService!.TryPutAsync(Db!, projectName, path, writeModel);
         });
     }
 
     [TestCase("DoesntExist")]
-    public void Put_InvalidProject_ReturnsFail(string projectName)
+    public async Task Put_InvalidProject_ReturnsFail(string projectName)
     {
         var writeModel = new NoteWriteModel
         {
@@ -120,7 +120,8 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
             ContentRaw = "foo/foo"
         };
 
-        var result = PrimaryService!.TryPut(Db!, projectName, "foo/foo", writeModel, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryPutAsync(Db!, projectName, "foo/foo", writeModel);
+        
         Assert.That(result, Is.False);
         Assert.That(readModel, Is.Null);
     }
@@ -135,7 +136,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
 
     [Test]
     [TestCaseSource(nameof(Put_ExistingPath_Idemptotent_Cases))]
-    public void Put_ExistingPath_Idemptotent(
+    public async Task Put_ExistingPath_Idemptotent(
         string path, 
         string checkId, 
         string expectedName, 
@@ -151,7 +152,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
             HtmlContent = "newHtml"
         };
 
-        var result = PrimaryService!.TryPut(Db!, ProjectName, "foo/bar", writeModel, out _);
+        var (result, _, _, _) = await PrimaryService!.TryPutAsync(Db!, ProjectName, "foo/bar", writeModel);
         var checkedNote = Db!.Notes.Find(checkId)!;
 
         Assert.That(result, Is.True);
@@ -166,7 +167,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
     }
 
     [Test]
-    public void Put_OrphanPath_ConnectsHeirarchy()
+    public async Task Put_OrphanPath_ConnectsHeirarchy()
     {
         var writeModel = new NoteWriteModel
         {
@@ -174,7 +175,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
             HtmlContent = "newHtml"
         };
 
-        var result = PrimaryService!.TryPut(Db!, ProjectName, "foo/alpha/beta", writeModel, out _);
+        var (result, _, _, _) = await PrimaryService!.TryPutAsync(Db!, ProjectName, "foo/alpha/beta", writeModel);
         var alpha = Db!.Notes.SingleOrDefault(n => n.Name == "alpha");
         var beta = Db.Notes.SingleOrDefault(n => n.Name == "beta");
 
@@ -204,17 +205,17 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
     [TestCase(ProjectName, "")]
     public void TryGet_EmptyInputs_Throws(string projectName, string path)
     {
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
         {
-            PrimaryService!.TryGet(Db!, projectName, path, out _);
+            await PrimaryService!.TryGetAsync(Db!, projectName, path);
         });
     }
 
     [TestCase("doesntexist", "foo")]
     [TestCase(ProjectName, "doesntexist")]
-    public void TryGet_InvalidInputs_Fail(string projectName, string path)
+    public async Task TryGet_InvalidInputs_Fail(string projectName, string path)
     {
-        var result = PrimaryService!.TryGet(Db!, projectName, path, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetAsync(Db!, projectName, path);
         Assert.That(result, Is.False);
         Assert.That(readModel, Is.Null);
     }
@@ -228,7 +229,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
     };
     [Test]
     [TestCaseSource(nameof(TryGet_ValidInput_MatchingOutput_Cases))]
-    public void TryGet_ValidInput_MatchingOutput(
+    public async Task TryGet_ValidInput_MatchingOutput(
         string path, 
         string expectedId,
         string expectedParentId,
@@ -236,7 +237,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
         string expectedRaw
     )
     {
-        var result = PrimaryService!.TryGet(Db!, ProjectName, path, out var readModel);
+        var (result, _, _, readModel) = await PrimaryService!.TryGetAsync(Db!, ProjectName, path);
 
         Assert.That(result, Is.True);
         Assert.That(readModel, Is.Not.Null);
@@ -253,24 +254,24 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
     [TestCase(ProjectName, "")]
     public void TryDelete_EmptyInputs_Throws(string projectName, string path)
     {
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
         {
-            PrimaryService!.TryDelete(Db!, projectName, path);
+            await PrimaryService!.TryDeleteAsync(Db!, projectName, path);
         });
     }
 
     [TestCase("doesntexist", "foo")]
     [TestCase(ProjectName, "doesntexist")]
-    public void TryDelete_InvalidInputs_Fail(string projectName, string path)
+    public async Task TryDelete_InvalidInputs_Fail(string projectName, string path)
     {
-        var result = PrimaryService!.TryDelete(Db!, projectName, path);
+        var (result, _, _, _) = await PrimaryService!.TryDeleteAsync(Db!, projectName, path);
         Assert.That(result, Is.False);
     }
 
     [Test]
-    public void TryDelete_ValidLeaf_Deletes()
+    public async Task TryDelete_ValidLeaf_Deletes()
     {
-        var result = PrimaryService!.TryDelete(Db!, ProjectName, "foo/bar/phi");
+        var (result, _, _, _) = await PrimaryService!.TryDeleteAsync(Db!, ProjectName, "foo/bar/phi");
         var foo_bar_phi = Db!.Notes.Find("3");
 
         Assert.That(result, Is.True);
@@ -286,7 +287,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
     };
     [Test]
     [TestCaseSource(nameof(TryDelete_ValidBranch_Clears_Cases))]
-    public void TryDelete_ValidBranch_Clears(
+    public async Task TryDelete_ValidBranch_Clears(
         string path,
         string checkId,
         string expectedName,
@@ -295,7 +296,7 @@ public class NoteServiceTests : TestBase<NoteService, MockHttpContextService, Mo
         string expectedRaw
     )
     {
-        var result = PrimaryService!.TryDelete(Db!, ProjectName, "foo/bar");
+        var (result, _, _, _) = await PrimaryService!.TryDeleteAsync(Db!, ProjectName, "foo/bar");
         var checkNote = Db!.Notes.Find(checkId);
 
         Assert.That(result, Is.True);
