@@ -1,23 +1,16 @@
-{{#> modal id='create-new-modal' title='Create New...'}}
+{{#> modal id="create-new-modal" titleTemplate="create-new-modal-header"}}
 <div class="d-flex flex-column h-100">
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#" data-bs-toggle="tab"
-                data-bs-target="#create-project-pane" id="create-project-tab"
-                aria-controls="create-project-pane" aria-selected="true">Project</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#create-note-pane"
-                id="create-note-tab" aria-controls="create-note-pane" aria-selected="false">Note</a>
-        </li>
-    </ul>
-
-    <div class="tab-content w-100 pt-3 flex-grow-1">
+    <div slot="body "class="tab-content w-100 pt-3 flex-grow-1">
         <div class="tab-pane h-100 active" id="create-project-pane" role="tabpanel"
             aria-labelledby="create-project-tab">
-            <form class="h-100 d-flex flex-column" method="POST" action="">
+            <form class="h-100 d-flex flex-column" method="POST" action="" id="create-project-form">
                 <div class="form-floating w-50 mb-3">
-                    {{> textInput name='name' displayName='Name' id='create-project-name' }}
+                    {{> textInput name='projectName' 
+                        displayName='Project Name' 
+                        id='create-project-name-input' 
+                        required=true 
+                        pattern='^[A-Za-z\-]{1,50}$'
+                    }}
                 </div>
 
                 {{> editProject }}
@@ -26,15 +19,36 @@
 
                 <div class="d-flex justify-content-end">
                     <button type="button" class="btn btn-secondary btn-lg">Cancel</button>
-                    <button type="button" class="btn btn-primary btn-lg ms-3">Create</button>
+                    <button type="submit" class="btn btn-primary btn-lg ms-3">Create</button>
                 </div>
             </form>
         </div>
+        {{#if ./data.createNotes }}
+            <div class="tab-pane h-100" id="create-note-pane" role="tabpanel"
+                aria-labelledby="create-project-tab" tabindex="0">
+                <form class="h-100 d-flex flex-column" method="POST" action="" id="create-note-form">
+                    <ol id="create-note-breadcrumbs" class="breadcrumb fs-3"></ol>
 
-        <div class="tab-pane w-75" id="create-note-pane" role="tabpanel" aria-labelledby="create-note-tab"
-            tabindex="0">
-            {{> noteForm }}
-        </div>
+                    <div class="form-floating w-50 mb-3">
+                        {{> textInput name='name'
+                            displayName='Note Name' 
+                            id='create-note-name-input' 
+                            pattern='^[A-Za-z\-]{1,50}$'
+                            required=true 
+                        }}
+                    </div>
+
+                    {{> editNote }}
+
+                    <hr class="mt-auto">
+
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary btn-lg">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-lg ms-3">Create</button>
+                    </div>
+                </form>
+            </div>
+        {{/if}}
     </div>
 </div>
 {{/modal}}

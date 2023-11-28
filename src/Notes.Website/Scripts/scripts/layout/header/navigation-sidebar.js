@@ -15,7 +15,7 @@ async function loadRecentAsync() {
     const recentTemplate = document.getElementById(`navigation-sidebar-recent-template`);
     const recentReadModel = await recentReadModelTask;
 
-    for (const recentModel of recentReadModel.recent) {
+    for (const recentModel of recentReadModel.data.recent) {
         recents.push(buildRecentElement(recentModel, recentTemplate));
     }
 
@@ -25,8 +25,11 @@ async function loadRecentAsync() {
 
 function buildRecentElement(recentModel, recentTemplate) {
     var recentElem = recentTemplate.content.cloneNode(true);
-    recentElem.querySelector(`span`).content = recentModel.name;
+    recentElem.querySelector(`span`).innerHTML = recentModel.name;
     recentElem.querySelector(`a`).href = recentModel.route;
+    recentElem.querySelector(`use`)
+        .setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#${recentModel.icon}`);
+    return recentElem;
 }
 
 async function loadOverviewAsync() {

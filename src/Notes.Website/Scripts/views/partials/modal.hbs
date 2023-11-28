@@ -2,7 +2,11 @@
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 id="{{id}}-title" class="modal-title">{{title}}</h1>
+                {{#if ./titleTemplate}}
+                    {{> (lookup . 'titleTemplate') }}
+                {{ else }}
+                    <h1 id="{{id}}-title" class="modal-title">{{title}}</h1>
+                {{/if}}
                 <button type="button" class="btn btn-outline-secondary btn-sm focus-ring" data-bs-dismiss="modal"
                     aria-label="Close">
                     <svg class="bi" aria-hidden="true">

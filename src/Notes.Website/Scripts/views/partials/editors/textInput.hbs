@@ -2,10 +2,11 @@
     name="{{name}}" 
     type="text" 
     class="form-control" 
-    id="{{name}}-input"
+    id="{{id}}"
     placeholder="{{displayName}}" 
     {{ternary required 'required' ''}}
-    aria-labelledby="{{name}}-input-lbl"
+    aria-labelledby="{{id}}-lbl"
     aria-required="{{required}}"
+    {{#if pattern}}pattern="{{pattern}}"{{/if}}
 >
-<label id="{{name}}-input-lbl" for="{{name}}-input">{{displayName}}</label>
+<label id="{{name}}-lbl" for="{{id}}">{{displayName}}</label>

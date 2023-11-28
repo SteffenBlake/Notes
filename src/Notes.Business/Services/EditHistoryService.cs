@@ -29,7 +29,7 @@ public class EditHistoryService : IEditHistoryService
         await db.EditHistory.AddAsync(new()
         {
             EdittedById = HttpContext.UserId!,
-            Timestamp = DateTimeOffset.Now,
+            Timestamp = DateTimeOffset.UtcNow,
         });
 
         await db.SaveChangesAsync();
@@ -40,7 +40,7 @@ public class EditHistoryService : IEditHistoryService
         await db.EditHistory.AddAsync(new()
         {
             EdittedById = HttpContext.UserId!,
-            Timestamp = DateTimeOffset.Now,
+            Timestamp = DateTimeOffset.UtcNow,
             ProjectId = projectId
         });
 
@@ -52,7 +52,7 @@ public class EditHistoryService : IEditHistoryService
         await db.EditHistory.AddAsync(new()
         {
             EdittedById = HttpContext.UserId!,
-            Timestamp = DateTimeOffset.Now,
+            Timestamp = DateTimeOffset.UtcNow,
             NoteId = noteId
         });
 

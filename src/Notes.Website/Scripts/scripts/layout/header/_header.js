@@ -1,14 +1,15 @@
-import { initAsync as navigationSidebarInitAsync } from './navigation-sidebar.js';
 import { initAsync as CreateNewModalInitAsync } from './create-new-modal.js';
+import { initAsync as initNavbarAsync } from './navbar.js';
+import { initAsync as navigationSidebarInitAsync } from './navigation-sidebar.js';
 
-(() => {
-    addEventListener("DOMContentLoaded", initAsync);
-})()
-
-async function initAsync() {
+export default async function() {
+    if (!document.getElementById(`navbar`)){
+        return;
+    }
 
     await Promise.all([
+        CreateNewModalInitAsync(),
+        initNavbarAsync(),
         navigationSidebarInitAsync(),
-        CreateNewModalInitAsync()
     ]);
 }

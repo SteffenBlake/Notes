@@ -1,0 +1,13 @@
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active fs-1" aria-current="page" href="#" data-bs-toggle="tab"
+            data-bs-target="#create-project-pane" id="create-project-tab"
+            aria-controls="create-project-pane" aria-selected="true">Create Project</a>
+    </li>
+    {{#if ./data.createNotes }}
+        <li class="nav-item">
+            <a class="nav-link fs-1" href="#" data-bs-toggle="tab" data-bs-target="#create-note-pane"
+                id="create-note-tab" aria-controls="create-note-pane" aria-selected="false">Create Note</a>
+        </li>
+    {{/if}}
+</ul>

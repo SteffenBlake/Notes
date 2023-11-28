@@ -1,28 +1,19 @@
-﻿export async function indexProjects()
+﻿import {getAsync, putAsync, delAsync } from './api-helper.js';
+
+export async function indexProjects()
 {
-    var resp = await window.fetch(`/api/projects/`);
-    return await resp.json();
+    return await getAsync(`/api/projects/`);
 }
 
 export async function readProject(projectName)
 {
-    var resp = await window.fetch(`/api/projects/${projectName}/`);
-    return await resp.json();
+    return await getAsync(`/api/projects/${projectName}/`);
 }
 
 export async function putProject(projectName, data) {
-    var resp = await window.fetch(`/api/projects/${projectName}/`, {
-        method: "PUT",
-        body: JSON.stringify(data)
-    });
-    if (!resp.ok) {
-        return;
-    }
-    return await resp.json();
+    return await putAsync(`/api/projects/${projectName}/`, data);
 }
 
 export async function deleteProject(projectName) {
-    await window.fetch(`/api/projects/${projectName}/`, {
-        method: "DELETE",
-    });
+    return await delAsync(`/api/projects/${projectName}/`);
 }

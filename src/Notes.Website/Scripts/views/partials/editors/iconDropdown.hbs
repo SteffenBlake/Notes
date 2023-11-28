@@ -1,0 +1,34 @@
+<div 
+    class="input-group mb-3 dropend" 
+    data-trigger="replace"
+    data-selector="a"
+    data-target="input"
+    data-placeholder="button"
+>
+    <input type="hidden" value="{{value}}" name="{{name}}" id="{{id}}"/>
+
+    <label class="input-group-text" for="{{id}}">Icon</label>
+    <button 
+        class="btn btn-outline-light dropdown-toggle fs-2" type="button"
+        data-bs-toggle="dropdown" data-bs-target="#{{id}}-dropdown" 
+        aria-expanded="false" aria-controls="{{id}}-dropdown"
+    >
+        <svg width="24" height="24" class="bi" fill="currentColor" viewBox="0 0 16 16">
+            <use href="#{{value}}"></use>
+        </svg>
+    </button>
+    <div class="dropdown-menu icon-dropdown fs-2" id="{{id}}-dropdown">
+        <div class="dropdown-icon-box">
+            {{#each data}}
+                <div>
+                    <a class="dropdown-item {{ternary (equal this ../value) 'text-bg-secondary' ''}}" data-value="{{this}}">
+                        <svg width="24" height="24" class="bi" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <use href="#{{this}}"></use>
+                        </svg>
+                    </a>
+                </div>
+            {{/each}}
+        </div>
+    </div>
+</div>

@@ -124,7 +124,7 @@ public class NoteService : INoteService
 
         db.SaveChanges();
 
-        await EditHistory.AddNoteEventAsync(db, heirarchy[0]!.NoteId);
+        await EditHistory.AddNoteEventAsync(db, heirarchy[^1]!.NoteId);
 
         return await TryGetAsync(db, projectName, path);
     }

@@ -1,6 +1,7 @@
 ﻿using Notes.Business.Models.Directories;
 using Notes.Business.Services;
 using Notes.Business.Tests.Mocks;
+using System.IO.Pipelines;
 
 namespace Notes.Business.Tests.Tests;
 
